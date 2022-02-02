@@ -3,7 +3,20 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.24375" />
+        <entry key="../../../../../layout/custom_preview.xml" value="0.134375" />
+        <entry key="../../../.gradle/caches/transforms-3/ffa473900d89e5d03063a622f6c0fe57/transformed/jetified-dkplayer-ui-3.3.5/res/layout/dkplayer_layout_complete_view.xml" value="0.23802083333333332" />
+        <entry key="../../../.gradle/caches/transforms-3/ffa473900d89e5d03063a622f6c0fe57/transformed/jetified-dkplayer-ui-3.3.5/res/layout/dkplayer_layout_prepare_view.xml" value="0.23802083333333332" />
+        <entry key="../../../.gradle/caches/transforms-3/ffa473900d89e5d03063a622f6c0fe57/transformed/jetified-dkplayer-ui-3.3.5/res/layout/dkplayer_layout_standard_controller.xml" value="0.23802083333333332" />
+        <entry key="../../../.gradle/caches/transforms-3/ffa473900d89e5d03063a622f6c0fe57/transformed/jetified-dkplayer-ui-3.3.5/res/layout/dkplayer_layout_title_view.xml" value="0.16173245614035087" />
+        <entry key="../../../.gradle/caches/transforms-3/ffa473900d89e5d03063a622f6c0fe57/transformed/jetified-dkplayer-ui-3.3.5/res/layout/dkplayer_layout_vod_control_view.xml" value="0.23802083333333332" />
+        <entry key="app/src/main/res/layout/act_player.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/act_videolist.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/act_videoplayer.xml" value="0.16173245614035087" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/view_listdata_empty.xml" value="0.11979166666666667" />
+        <entry key="app/src/main/res/layout/view_toplayout.xml" value="0.11979166666666667" />
+        <entry key="app/src/main/res/layout/view_toptitle_layout.xml" value="0.1157548125633232" />
+        <entry key="app/src/main/res/layout/view_videolist_item.xml" value="0.11979166666666667" />
       </map>
     </option>
   </component>

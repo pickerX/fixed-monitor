@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:background="#ffffffff">
+
+    <ImageView
+        android:id="@+id/videologo_iv"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:scaleType="centerCrop"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="12dp" />
+
+    <TextView
+        android:id="@+id/videoname_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/videologo_iv"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="8dp"
+        android:textSize="16sp"
+        android:text="#ff333333"
+        />
+
+    <TextView
+        android:id="@+id/videotime_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/videoname_tv"
+        android:layout_toRightOf="@id/videologo_iv"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="8dp"
+        android:textSize="12sp"
+        android:text="#ffeeeeee"
+        />
+
+    <TextView
+        android:id="@+id/videocache_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/videotime_tv"
+        android:layout_toRightOf="@id/videologo_iv"
+        android:layout_marginTop="2dp"
+        android:layout_marginLeft="8dp"
+        android:textSize="12sp"
+        android:text="#ffeeeeee"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentBottom="true"
+        android:background="#ffe8e8e8" />
+</RelativeLayout>
