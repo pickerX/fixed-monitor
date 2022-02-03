@@ -6,16 +6,14 @@ import android.text.TextUtils;
 
 
 import com.fixed.monitor.R;
-import com.fixed.monitor.model.base.BaseAct;
+import com.fixed.monitor.base.BaseAct;
 import com.fixed.monitor.view.VideoTitileView;
 
 import xyz.doikki.videocontroller.StandardVideoController;
 import xyz.doikki.videocontroller.component.CompleteView;
 import xyz.doikki.videocontroller.component.ErrorView;
 import xyz.doikki.videocontroller.component.GestureView;
-import xyz.doikki.videocontroller.component.LiveControlView;
 import xyz.doikki.videocontroller.component.PrepareView;
-import xyz.doikki.videocontroller.component.TitleView;
 import xyz.doikki.videocontroller.component.VodControlView;
 import xyz.doikki.videoplayer.player.VideoView;
 

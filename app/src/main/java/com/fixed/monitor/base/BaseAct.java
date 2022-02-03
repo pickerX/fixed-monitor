@@ -1,4 +1,4 @@
-package com.fixed.monitor.model.base;
+package com.fixed.monitor.base;
 
 import android.os.Bundle;
 import android.view.View;

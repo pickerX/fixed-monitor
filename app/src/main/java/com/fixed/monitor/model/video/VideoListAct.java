@@ -2,8 +2,6 @@ package com.fixed.monitor.model.video;
 
 import android.content.Context;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -12,10 +10,8 @@ import com.fixed.monitor.R;
 import com.fixed.monitor.base.adapter.MCommAdapter;
 import com.fixed.monitor.base.adapter.MCommVH;
 import com.fixed.monitor.bean.VideoBean;
-import com.fixed.monitor.model.base.BaseAct;
+import com.fixed.monitor.base.BaseAct;
 import com.fixed.monitor.util.DataUtil;
-
-import java.util.ArrayList;
 
 public class VideoListAct extends BaseAct {
 
