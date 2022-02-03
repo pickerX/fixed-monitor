@@ -36,12 +36,10 @@ public class VideoListAct extends BaseAct {
 
             @Override
             public void bindData(Context context, MCommVH mCommVH, int position, VideoBean o) {
-
 //                ImageView videologo_iv = (ImageView) mCommVH.getView(R.id.videologo_iv);
 //                TextView videoname_tv = (TextView) mCommVH.getView(R.id.videoname_tv);
 //                TextView videotime_tv = (TextView) mCommVH.getView(R.id.videotime_tv);
 //                TextView videocache_tv = (TextView) mCommVH.getView(R.id.videocache_tv);
-
                 mCommVH.setText(R.id.videoname_tv, o.getTitle());
                 mCommVH.setText(R.id.videotime_tv, "时长：30分钟");
                 mCommVH.setText(R.id.videocache_tv, o.getUrl());

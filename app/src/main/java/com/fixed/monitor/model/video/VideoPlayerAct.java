@@ -26,7 +26,7 @@ public class VideoPlayerAct extends BaseAct {
      * @author jiejack
      * @time 2022/2/2 4:57 下午
      */
-    public static void openAct(Context context, String title ,String url) {
+    public static void openAct(Context context, String title, String url) {
         Intent intent = new Intent(context, VideoPlayerAct.class);
         intent.putExtra("title", title);
         intent.putExtra("url", url);
@@ -42,7 +42,7 @@ public class VideoPlayerAct extends BaseAct {
 
     @Override
     public void initView() {
-        videoView    = findViewById(R.id.player);
+        videoView = findViewById(R.id.player);
 
     }
 
