@@ -1,6 +1,9 @@
 package com.lib.record;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
@@ -10,20 +13,28 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.MediaCodec;
 import android.media.MediaRecorder;
+import android.media.MediaScannerConnection;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
+import android.util.Range;
 import android.util.Size;
 import android.view.OrientationEventListener;
 import android.view.Surface;
+import android.view.SurfaceHolder;
 
-import androidx.camera.core.AspectRatio;
-import androidx.camera.core.ImageAnalysis;
+import androidx.annotation.NonNull;
 import androidx.camera.core.ImageCapture;
 
+import com.lib.record.view.AutoFitSurfaceView;
+
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -37,15 +48,16 @@ public class XCamera {
     private final Config config;
     private CameraManager mCameraManager;
     private CameraCharacteristics mCharacteristics;
-    /**
-     * 预览的 View，按需初始化
-     */
-    private Surface mPreviewSurface;
+
+    private Surface mRecordSurface;
+    private AutoFitSurfaceView mPreviewSurface;
+
     private CameraCaptureSession mSession;
     private CameraDevice mCameraDevice;
+
     private CaptureRequest mPreviewRequest;
     private CaptureRequest mRecordRequest;
-
+    private MediaRecorder mRecorder;
     /**
      * [HandlerThread] where all camera operations run
      */
@@ -57,42 +69,81 @@ public class XCamera {
     private final Handler cameraHandler;
 
     private static final int RECORDER_VIDEO_BITRATE = 10_000_000;
+    private Context mContext;
+    private CameraInfo mFront;
+
+    private File mOutputFile;
+    private long recordingStartMillis;
+
 
     public XCamera(Config config) {
         this.config = config;
         cameraThread.start();
+        mPreviewSurface = config.target;
         cameraHandler = new Handler(cameraThread.getLooper());
     }
 
-    public void init(Context context) {
+    public void prepare(Context context) {
+        mContext = context;
         mCameraManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
-        ImageCapture imageCapture =
-                new ImageCapture.Builder()
-                        .setFlashMode(ImageCapture.FLASH_MODE_OFF)
-                        .setTargetAspectRatio(AspectRatio.RATIO_4_3)
-                        .build();
-        ImageAnalysis imageAnalysis =
-                new ImageAnalysis.Builder()
-                        .setTargetResolution(new Size(1280, 720))
-                        .build();
-
-//        ViewPort viewPort = new ViewPort.Builder(
-//                new Rational(width, height),
-//                getDisplay().getRotation()).build();
-//        UseCaseGroup useCaseGroup = new UseCaseGroup.Builder()
-//                .addUseCase(preview)
-//                .addUseCase(imageAnalysis)
-//                .addUseCase(imageCapture)
-//                .setViewPort(viewPort)
-//                .build();
-//        cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, useCaseGroup);
         try {
+            Log.d(TAG, "Flow: 1. fetch support cameras");
             List<CameraInfo> cameras = enumerateVideoCameras(mCameraManager);
-            CameraInfo front = cameras.get(0);
-            mCharacteristics = mCameraManager.getCameraCharacteristics(front.cameraId);
+            // get base camera for now
+            mFront = cameras.get(0);
+            Log.d(TAG, "Flow: 2. find best camera:" + mFront);
+            mCharacteristics = mCameraManager.getCameraCharacteristics(mFront.cameraId);
+            mOutputFile = RecordUtils.createFile(mContext, config.directory, "mp4");
+            Log.d(TAG, "File prepared >>>>>" + mOutputFile.getAbsolutePath());
+
             if (config.preview) {
-                mPreviewSurface = createSurface(front);
+                mRecordSurface = createRecordSurface(mFront);
+                Log.d(TAG, "record surface prepared!!");
             }
+            if (mPreviewSurface == null && config.preview) {
+                Log.e(TAG, "output target cannot be null");
+                return;
+            }
+            // only support preview for now
+            if (mPreviewSurface == null) return;
+            Log.d(TAG, "Flow: 3. prepare surfaceView");
+            SurfaceHolder holder = mPreviewSurface.getHolder();
+            holder.addCallback(new SurfaceHolder.Callback() {
+                @Override
+                public void surfaceCreated(@NonNull SurfaceHolder surfaceHolder) {
+                    // Selects appropriate preview size and configures view finder
+                    Size previewSize = RecordUtils.getPreviewOutputSize(
+                            mPreviewSurface.getDisplay(), mCharacteristics, SurfaceHolder.class, 0);
+                    if (previewSize == null) {
+                        Log.e(TAG, "Preview size cannot be null");
+                        return;
+                    }
+                    Log.d(TAG, "Flow: 4. find best preview size:" + previewSize);
+                    Log.d(TAG, "View finder size:" +
+                            surfaceHolder.getSurfaceFrame().width() +
+                            " x " + surfaceHolder.getSurfaceFrame().height());
+                    try {
+                        mPreviewSurface.setAspectRatio(previewSize.getWidth(), previewSize.getHeight());
+                        // To ensure that size is set, initialize camera in the view's thread
+                        mPreviewSurface.post(() -> {
+                            Log.d(TAG, "Flow: 5. prepare done!");
+                            initializeCamera(mFront.cameraId);
+                        });
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void surfaceChanged(@NonNull SurfaceHolder surfaceHolder, int i, int i1, int i2) {
+
+                }
+
+                @Override
+                public void surfaceDestroyed(@NonNull SurfaceHolder surfaceHolder) {
+
+                }
+            });
         } catch (CameraAccessException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -101,23 +152,196 @@ public class XCamera {
         }
     }
 
-    private Surface createSurface(CameraInfo front) throws IOException {
+    private void initializeCamera(String cameraId) {
+        try {
+            Log.d(TAG, "Flow: 6. open camera");
+            openCamera(mCameraManager, cameraId, cameraHandler);
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 需要权限校验，可异步
+     */
+    @SuppressLint("MissingPermission")
+    public void openCamera(CameraManager cameraManager,
+                           String cameraId,
+                           Handler handler) throws CameraAccessException {
+        CameraDevice.StateCallback callback = new CameraDevice.StateCallback() {
+            @Override
+            public void onOpened(@NonNull CameraDevice cameraDevice) {
+                Log.d(TAG, "Flow: 7. Camera " + cameraId + " has been opened!!");
+                try {
+                    Log.d(TAG, "Flow: 8. creating camera capture session");
+                    createCaptureSession(cameraDevice, getTargets(), handler);
+                } catch (CameraAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onDisconnected(@NonNull CameraDevice cameraDevice) {
+                Log.w(TAG, "Camera $cameraId has been disconnected");
+            }
+
+            @Override
+            public void onError(@NonNull CameraDevice cameraDevice, int i) {
+                Log.e(TAG, "Camera " + cameraId + "open failed!!");
+                switch (i) {
+                    case ERROR_CAMERA_DISABLED:
+                        Log.e(TAG, ">>> error camera disabled");
+                        break;
+                    case ERROR_CAMERA_DEVICE:
+                        Log.e(TAG, ">>> error camera device");
+                        break;
+                    case ERROR_CAMERA_IN_USE:
+                        Log.e(TAG, ">>> error camera in use");
+                        break;
+                    case ERROR_CAMERA_SERVICE:
+                        Log.e(TAG, ">>> error camera service");
+                        break;
+                    case ERROR_MAX_CAMERAS_IN_USE:
+                        Log.e(TAG, ">>> error max cameras in use");
+                        break;
+                    default:
+                        Log.e(TAG, ">>> unknown");
+                        break;
+                }
+            }
+        };
+
+        cameraManager.openCamera(cameraId, callback, handler);
+    }
+
+    private void createCaptureSession(
+            CameraDevice device,
+            List<Surface> targets,
+            Handler handler) throws CameraAccessException {
+        CameraCaptureSession.StateCallback callback = new CameraCaptureSession.StateCallback() {
+            @Override
+            public void onConfigured(@NonNull CameraCaptureSession cameraCaptureSession) {
+                Log.d(TAG, "Flow: 9. Session configured!!");
+                try {
+                    mSession = cameraCaptureSession;
+                    Log.d(TAG, "Flow: 10. create preview and record requests!!");
+                    mPreviewRequest = createPreviewRequest(targets.get(0), mSession);
+                    mRecordRequest = createVideoRequest(mSession,
+                            mPreviewSurface.getHolder().getSurface(),
+                            mRecordSurface, mFront.fps);
+                    mSession.setRepeatingRequest(mPreviewRequest, null, handler);
+                    start(mSession, handler);
+                } catch (CameraAccessException | IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
+                Log.e(TAG, "Camera " + device.getId() + " session configuration failed");
+                mSession = null;
+            }
+        };
+
+        device.createCaptureSession(targets, callback, handler);
+    }
+
+    private void start(CameraCaptureSession session, Handler handler) throws CameraAccessException, IOException {
+        if (config.preview) {
+            // Prevents screen rotation during the video recording
+            ((Activity) mContext).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
+        }
+        // Start recording repeating requests, which will stop the ongoing preview
+        // repeating requests without having to explicitly call `session.stopRepeating`
+        session.setRepeatingRequest(mRecordRequest, null, handler);
+        // Finalizes recorder setup and starts recording
+
+        mRecorder = createRecorder(mRecordSurface, mFront.fps,
+                mFront.size.getWidth(),
+                mFront.size.getHeight(),
+                mOutputFile.getAbsolutePath());
+        // Sets output orientation based on current sensor value at start time
+//        recorder.relativeOrientation.value ?.let {
+//            setOrientationHint(it);
+//        }
+        mRecorder.prepare();
+        mRecorder.start();
+
+        recordingStartMillis = System.currentTimeMillis();
+        Log.d(TAG, "Flow: 11. Finalizes Recording started at " + recordingStartMillis);
+        Log.d(TAG, "Recording started");
+
+        // Starts recording animation
+        // fragmentCameraBinding.overlay.post(animationTask);
+        counterHandler.sendEmptyMessageDelayed(MSG_WHAT_TRY_TO_STOP, 60 * 1000);
+    }
+
+    private static final int MSG_WHAT_TRY_TO_STOP = 100;
+
+    private final Handler counterHandler = new Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+
+            if (msg.what == MSG_WHAT_TRY_TO_STOP) tryToStop();
+
+        }
+    };
+
+    private void tryToStop() {
+        // Requires recording of at least MIN_REQUIRED_RECORDING_TIME_MILLIS
+        long elapsedTimeMillis = (System.currentTimeMillis() - recordingStartMillis) / 1000;
+        if (elapsedTimeMillis < config.duration * 60L) {
+            counterHandler.sendEmptyMessageDelayed(MSG_WHAT_TRY_TO_STOP, 60 * 1000);
+            return;
+        }
+        stop();
+    }
+
+    public void stop() {
+        if (config.preview) {
+            // Prevents screen rotation during the video recording
+            ((Activity) mContext).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
+        }
+
+        Log.d(TAG, "Recording stopped. Output file:" + mOutputFile.getAbsolutePath());
+        mRecorder.stop();
+
+        // Removes recording animation
+        // fragmentCameraBinding.overlay.removeCallbacks(animationTask);
+
+        // Broadcasts the media file to the rest of the system
+        MediaScannerConnection.scanFile(
+                mContext, new String[]{mOutputFile.getAbsolutePath()}, null, null);
+    }
+
+    private Surface createRecordSurface(CameraInfo front) throws IOException {
         Surface surface = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
             surface = MediaCodec.createPersistentInputSurface();
-            createRecorder(surface, front.fps, front.size.getWidth(), front.size.getHeight());
+            MediaRecorder mr = createRecorder(surface,
+                    front.fps,
+                    front.size.getWidth(),
+                    front.size.getHeight(),
+                    mOutputFile.getAbsolutePath());
+            mr.prepare();
+            mr.release();
         }
 
         return surface;
     }
 
-    private void createRecorder(Surface surface, int fps, int width, int height) throws IOException {
+    private MediaRecorder createRecorder(Surface surface,
+                                         int fps,
+                                         int width,
+                                         int height,
+                                         String directory) throws IOException {
+        // check path valid
         MediaRecorder mr = new MediaRecorder();
         mr.setAudioSource(MediaRecorder.AudioSource.MIC);
         mr.setVideoSource(MediaRecorder.VideoSource.SURFACE);
         mr.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-        // TODO change path
-        mr.setOutputFile(config.directory);
+        mr.setOutputFile(directory);
         mr.setVideoEncodingBitRate(RECORDER_VIDEO_BITRATE);
         if (fps > 0) mr.setVideoFrameRate(fps);
 
@@ -127,18 +351,34 @@ public class XCamera {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             mr.setInputSurface(surface);
         }
-        mr.prepare();
-        mr.release();
+        return mr;
     }
 
     /**
      * 构造预览 request
      */
-    private CaptureRequest createPreviewRequest(Surface outputTarget) throws CameraAccessException {
-        CaptureRequest.Builder b = mSession.getDevice()
+    private CaptureRequest createPreviewRequest(Surface outputTarget, CameraCaptureSession session) throws CameraAccessException {
+        if (session == null) {
+            Log.e(TAG, "No Session created!!");
+            return null;
+        }
+        CaptureRequest.Builder b = session.getDevice()
                 .createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
         b.addTarget(outputTarget);
         return b.build();
+    }
+
+    private CaptureRequest createVideoRequest(CameraCaptureSession session,
+                                              Surface outputTargetView,
+                                              Surface outputTarget,
+                                              int fps) throws CameraAccessException {
+        CaptureRequest.Builder request = session.getDevice()
+                .createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
+        request.addTarget(outputTargetView);
+        request.addTarget(outputTarget);
+        request.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, new Range(fps, fps));
+
+        return request.build();
     }
 
     private void setupListeners(Context context, ImageCapture imageCapture) {
@@ -174,19 +414,23 @@ public class XCamera {
         String type;
         switch (value) {
             case CameraCharacteristics.LENS_FACING_BACK:
-                type = "Back";
+                type = Monitor.FACING_BACK;
                 break;
             case CameraCharacteristics.LENS_FACING_FRONT:
-                type = "Front";
+                type = Monitor.FACING_FRONT;
                 break;
             case CameraCharacteristics.LENS_FACING_EXTERNAL:
-                type = "External";
+                type = Monitor.FACING_EXTERNAL;
                 break;
             default:
-                type = "Unknown";
+                type = Monitor.FACING_UNKNOWN;
                 break;
         }
         return type;
+    }
+
+    private List<Surface> getTargets() {
+        return Arrays.asList(mPreviewSurface.getHolder().getSurface(), mRecordSurface);
     }
 
     /**
@@ -205,15 +449,16 @@ public class XCamera {
             CameraCharacteristics characteristics = cameraManager.getCameraCharacteristics(id);
             String orientation = lensOrientationString(
                     characteristics.get(CameraCharacteristics.LENS_FACING));
-
             // Query the available capabilities and output formats
             int[] capabilities = characteristics.get(
                     CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES);
             StreamConfigurationMap cameraConfig = characteristics.get(
                     CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
 
+            boolean filter = config.cameraOrientation.equals(orientation);
+
             // Return cameras that declare to be backward compatible
-            if (hasCapability(capabilities, CameraCharacteristics
+            if (filter && hasCapability(capabilities, CameraCharacteristics
                     .REQUEST_AVAILABLE_CAPABILITIES_BACKWARD_COMPATIBLE)) {
                 // Recording should always be done in the most efficient format, which is
                 //  the format native to the camera framework
@@ -236,9 +481,10 @@ public class XCamera {
                         fpsLabel = "N/A";
 
                     String name = String.format(Locale.getDefault(),
-                            "%s (%s) %s %s FPS", orientation, id, size.toString(), fpsLabel);
-                    availableCameras.add(
-                            new CameraInfo(name, id, size, fps));
+                            "%s (%s) %s %s FPS", orientation, id, size.toString(), fps);
+                    CameraInfo c = new CameraInfo(name, id, size, fps);
+                    availableCameras.add(c);
+                    Log.d(TAG, c.name);
                 }
             }
         }

@@ -6,7 +6,7 @@ package com.lib.record;
  */
 public class MonitorFactory implements Monitor.Factory {
 
-    public static MonitorFactory getInstance() {
+    public static Monitor.Factory getInstance() {
         return new MonitorFactory();
     }
 

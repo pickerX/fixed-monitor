@@ -22,13 +22,8 @@ public class AutoLaunchReceiver extends BroadcastReceiver {
         }
 
         if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
-            Config config = new ConfigBuilder()
-                    .build();
-            Monitor monitor = MonitorFactory.getInstance()
-                    .create(config);
-
-
-            monitor.recordNow();
+            Intent preview = new Intent(context, MainActivity.class);
+            context.startActivity(preview);
         }
     }
 }

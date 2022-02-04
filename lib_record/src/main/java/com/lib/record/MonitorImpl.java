@@ -1,5 +1,7 @@
 package com.lib.record;
 
+import android.content.Context;
+
 /**
  * @author pickerx
  * @date 2022/1/27 8:54 下午
@@ -12,8 +14,8 @@ public class MonitorImpl implements Monitor {
     }
 
     @Override
-    public boolean recordNow() {
-
+    public boolean recordNow(Context context) {
+        mCamera.prepare(context);
 
         return false;
     }

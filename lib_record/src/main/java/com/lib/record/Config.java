@@ -1,5 +1,9 @@
 package com.lib.record;
 
+import android.view.SurfaceView;
+
+import com.lib.record.view.AutoFitSurfaceView;
+
 /**
  *
  */
@@ -19,9 +23,15 @@ public class Config {
     /**
      * 录制的摄像头
      */
-    int camera;
+    String cameraId;
+    /**
+     * 摄像头类型：前置，后置，外部
+     */
+    String cameraOrientation;
     /**
      * 是否需要预览
      */
     boolean preview;
+
+    AutoFitSurfaceView target;
 }

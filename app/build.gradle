@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.application'
+    id 'androidx.navigation.safeargs'
 }
 
 android {
@@ -16,7 +17,7 @@ android {
         ndk {
             //设置支持的SO库架构（开发者可以根据需要，选择一个或多个平台的so）
 //            abiFilters "armeabi", "armeabi-v7a", "arm64-v8a", "x86", "arm64-v8a", "x86_64"
-            abiFilters "armeabi", "arm64-v8a","x86"//减少支持的架构，避免安装包过大
+            abiFilters "armeabi", "arm64-v8a", "x86"//减少支持的架构，避免安装包过大
         }
     }
     buildTypes {
@@ -58,4 +59,9 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
     //文件选择器
     implementation 'com.github.ZLYang110:FileSelector:2.1.4'
+
+    // Navigation library
+    def nav_version = "2.2.2"
+    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
+    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 }

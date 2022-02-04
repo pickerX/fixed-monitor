@@ -1,5 +1,7 @@
 package com.lib.record;
 
+import android.content.Context;
+
 /**
  * 监听器 API
  *
@@ -7,6 +9,11 @@ package com.lib.record;
  * @date 2022/1/27 8:25 下午
  */
 public interface Monitor {
+    String FACING_BACK = "Back";
+    String FACING_FRONT = "Front";
+    String FACING_EXTERNAL = "External";
+    String FACING_UNKNOWN = "Unknown";
+
     /**
      * 默认录制时长
      */
@@ -23,9 +30,10 @@ public interface Monitor {
     /**
      * 开始录制
      *
+     * @param context
      * @return true 启动成功，false 失败
      */
-    boolean recordNow();
+    boolean recordNow(Context context);
 
     void release();
 
