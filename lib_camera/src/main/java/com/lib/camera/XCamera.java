@@ -51,6 +51,7 @@ public class XCamera {
 
     private Surface mRecordSurface;
     private final AutoFitSurfaceView mPreviewSurface;
+    private List<Surface> mTargets;
 
     private CameraCaptureSession mSession;
     private CameraDevice mCameraDevice;
@@ -193,7 +194,8 @@ public class XCamera {
                 try {
                     Log.d(TAG, "Flow: 8. creating camera capture session");
                     mCameraDevice = cameraDevice;
-                    createCaptureSession(cameraDevice, getTargets(), handler);
+                    mTargets = getTargets();
+                    createCaptureSession(cameraDevice, mTargets, handler);
                 } catch (CameraAccessException e) {
                     e.printStackTrace();
                 }
@@ -201,7 +203,7 @@ public class XCamera {
 
             @Override
             public void onDisconnected(@NonNull CameraDevice cameraDevice) {
-                Log.w(TAG, "Camera $cameraId has been disconnected");
+                Log.w(TAG, "Camera " + cameraId + " has been disconnected");
             }
 
             @Override
@@ -318,8 +320,12 @@ public class XCamera {
     public void restart() {
         mOutputFile = CameraUtils.createFile(mContext, config.directory, "mp4");
         mPreviewSurface.post(() -> {
-            Log.d(TAG, "Flow: start next record!");
-            initializeCamera(mFront.cameraId);
+            Log.d(TAG, "Flow: new capture session, start next record!");
+            try {
+                createCaptureSession(mCameraDevice, mTargets, cameraHandler);
+            } catch (CameraAccessException e) {
+                e.printStackTrace();
+            }
         });
     }
 

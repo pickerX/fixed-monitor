@@ -10,6 +10,7 @@ import android.view.Display;
 import com.lib.record.Monitor;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -106,6 +107,37 @@ public class CameraUtils {
     }
 
     static SmartSize SIZE_1080P = new SmartSize(1920, 1080);
+
+    /**
+     * 检测剩余的存储大小
+     *
+     * @param specSize 最大size
+     * @return true 超过 specSize
+     */
+    public static boolean checkLeftSpace(int specSize) {
+
+        return false;
+    }
+
+    /**
+     * 删除录制文件，释放一定的空间
+     *
+     * @param dir    视频目录
+     * @param number 要删除的文件数量
+     */
+    public static void clearWith(String dir, int number) {
+        File file = new File(dir);
+        if (!file.exists()) return;
+
+        // 过滤最旧的视频文件
+        File[] bad = file.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File file, String s) {
+                // 过滤最旧的视频文件
+                return false;
+            }
+        });
+    }
 }
 
 /**

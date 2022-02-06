@@ -57,6 +57,7 @@ public class CameraFragment extends Fragment {
                 .setDirectory(VideoPathUtil.getPath(requireContext()))
                 .setCameraOrientation(Monitor.FACING_FRONT)
                 .setTarget(mAutoFitSurfaceView)
+                //.setDuration(1) 1分钟录制时长，测试用
                 .setDirectory(directory)
                 .setPreview(true)
                 .setLoop(true)
