@@ -79,6 +79,8 @@ public class PopupSetPswView extends PopupBaseView {
                 if(mscode_ipv.getNowText().equals(mscode_ipv2.getNowText())){
                     PasswordUtil.savePsw(context,mscode_ipv.getNowText());
                     T.showShort(context,"密码设置成功");
+                    mscode_ipv.clearText();
+                    mscode_ipv2.clearText();
                     dismiss();
                 }else{
                     T.showShort(context,"两次密码不一致");

@@ -30,21 +30,21 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        findViewById(R.id.test_tv).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//              VideoPlayerAct.openAct(MainActivity.this, DataUtil.SAMPLE_URL);
-                startActivity(new Intent(MainActivity.this, VideoListAct.class));
-//                popupInputPswView.showCenter(findViewById(R.id.test_tv));
-            }
-        });
-        findViewById(R.id.settting_tv).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//              VideoPlayerAct.openAct(MainActivity.this, DataUtil.SAMPLE_URL);
-                startActivity(new Intent(MainActivity.this, SettingAct.class));
-            }
-        });
+//        findViewById(R.id.test_tv).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+////              VideoPlayerAct.openAct(MainActivity.this, DataUtil.SAMPLE_URL);
+//                startActivity(new Intent(MainActivity.this, VideoListAct.class));
+////                popupInputPswView.showCenter(findViewById(R.id.test_tv));
+//            }
+//        });
+//        findViewById(R.id.settting_tv).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+////              VideoPlayerAct.openAct(MainActivity.this, DataUtil.SAMPLE_URL);
+//                startActivity(new Intent(MainActivity.this, SettingAct.class));
+//            }
+//        });
 
         new Handler().postDelayed(new Runnable() {
             @Override

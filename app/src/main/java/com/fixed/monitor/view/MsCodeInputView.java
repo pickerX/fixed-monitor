@@ -80,12 +80,14 @@ public class MsCodeInputView extends LinearLayout {
             EditText editText = new EditText(getContext());
             editText.setBackground(null);
             editText.setTag(i + "");
+            editText.setTextColor(0xff333333);
             editText.setGravity(Gravity.CENTER);
             editText.setTextAlignment(TEXT_ALIGNMENT_CENTER);
             editText.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
             editText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
             editText.addTextChangedListener(new MyTextWatch(editText));
-            editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+//            editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+            editText.setInputType( InputType.TYPE_NUMBER_VARIATION_PASSWORD|InputType.TYPE_CLASS_NUMBER );
             editText.setOnKeyListener(new OnKeyListener() {
                 @Override
                 public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -171,60 +173,73 @@ public class MsCodeInputView extends LinearLayout {
 
     /**
      * @param
-     * @author jieja
-     * @description 输入监听
      * @return
-     * @time 2021/11/22 8:54
+     * @description 清空密码
+     * @author jiejack
+     * @time 2022/2/4 4:19 下午
      */
-    public class MyTextWatch implements TextWatcher {
-        public EditText et = null;
-
-        public MyTextWatch(EditText et) {
-            this.et = et;
+    public void clearText() {
+        for (int i = 0; i < editTextViews.size(); i++) {
+            editTextViews.get(i).setText("");
         }
+    }
 
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+/**
+ * @param
+ * @author jieja
+ * @description 输入监听
+ * @return
+ * @time 2021/11/22 8:54
+ */
+public class MyTextWatch implements TextWatcher {
+    public EditText et = null;
 
-        }
+    public MyTextWatch(EditText et) {
+        this.et = et;
+    }
 
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-        }
+    }
 
-        @Override
-        public void afterTextChanged(Editable s) {
-            if (s.length() > 1) {
-                et.setText(s.charAt(s.length() - 1) + "");
-                et.setSelection(et.length());
-            } else {
-                if (s.length() > 0) {
-                    int nexPos = ToolUtil.string2Int(et.getTag().toString()) + 1;
-                    if (nexPos < editTextViews.size()) {
-                        editTextViews.get(nexPos).requestFocus();
-                        et.setSelection(et.length());
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+        if (s.length() > 1) {
+            et.setText(s.charAt(s.length() - 1) + "");
+            et.setSelection(et.length());
+        } else {
+            if (s.length() > 0) {
+                int nexPos = ToolUtil.string2Int(et.getTag().toString()) + 1;
+                if (nexPos < editTextViews.size()) {
+                    editTextViews.get(nexPos).requestFocus();
+                    et.setSelection(et.length());
 //                    editTextViews.get(nexPos).setSelection(editTextViews.get(nexPos).length());
 //                    if (onMsCodeInterface != null) {
 //                        onMsCodeInterface.inputUnReady();
 //                    }
-                    }
                 }
-                if (onMsCodeInterface != null) {
-                    if (checkIsAllInput()) {
-                        onMsCodeInterface.inputFinish(getNowText());
-                    } else {
-                        onMsCodeInterface.inputUnReady();
-                    }
+            }
+            if (onMsCodeInterface != null) {
+                if (checkIsAllInput()) {
+                    onMsCodeInterface.inputFinish(getNowText());
+                } else {
+                    onMsCodeInterface.inputUnReady();
                 }
+            }
 //                else {//全部输入完成
 //                    if (onMsCodeInterface != null) {
 //                        onMsCodeInterface.inputFinish(getNowText());
 //                    }
 //                }
-            }
         }
     }
+}
 
 
 }

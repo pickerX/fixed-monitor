@@ -18,7 +18,7 @@ import java.util.ArrayList;
 
 public class SettingAct extends BaseAct {
 
-    View setpath_fl, setpsw_fl;
+    View setpath_fl, setpsw_fl,loadcat_rl;
     TextView path_tv;
     PopupInputPswView popupInputPswView;
     PopupSetPswView popupSetPswView;
@@ -58,6 +58,14 @@ public class SettingAct extends BaseAct {
                 popupInputPswView.showCenter(setpsw_fl);
             }
         });
+        loadcat_rl = findViewById(R.id.loadcat_rl);
+        loadcat_rl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
     }
 
     @Override

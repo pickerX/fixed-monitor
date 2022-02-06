@@ -55,12 +55,17 @@ public class MonitorImpl implements Monitor {
             }
 
             @Override
-            public void onStopped(long stopMillis) {
-                if (mStateCallback != null) mStateCallback.onStopped(stopMillis);
+            public void onStopped(long stopMillis, String name, String path, long size,long duringTime) {
+                if (mStateCallback != null) mStateCallback.onStopped(stopMillis,name,path,size,duringTime);
                 if (config.loop) {
                     dispatchNext();
                 }
             }
+
+//            @Override
+//            public void onStopped(long stopMillis) {
+//
+//            }
         };
         this.mCamera.bindLifecycle(callback);
     }

@@ -72,7 +72,6 @@
             android:layout_marginTop="10dp"
             android:layout_marginRight="20dp"
             android:background="@drawable/shape_fff1f3f4_r22"
-            android:enabled="false"
             android:gravity="center"
             android:text="取消"
             android:textColor="#ff878a8c"

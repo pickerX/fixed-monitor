@@ -64,4 +64,13 @@ dependencies {
     def nav_version = "2.2.2"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+
+    //ormlite数据库
+    implementation group: 'com.j256.ormlite', name: 'ormlite-core', version: '5.1'
+    implementation group: 'com.j256.ormlite', name: 'ormlite-android', version: '5.1'
+    /** SmartRefreshLayout **/
+    implementation 'com.scwang.smart:refresh-layout-kernel:2.0.1'      //核心必须依赖
+    implementation 'com.scwang.smart:refresh-header-classics:2.0.1'    //经典刷新头
+    implementation 'com.scwang.smart:refresh-header-radar:2.0.1'       //雷达刷新头
+    implementation 'com.scwang.smart:refresh-footer-classics:2.0.1'    //经典加载
 }

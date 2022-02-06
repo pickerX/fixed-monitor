@@ -83,6 +83,16 @@ public class MCommAdapter<B extends Object> extends MBaseAdapter<MCommVH> {
         return isEmpty ? 1 : beanList.size();
     }
 
+    /**
+     * @param
+     * @return
+     * @description 返回当前数组大小
+     * @author jiejack
+     * @time 2022/2/4 9:36 下午
+     */
+    public int getSize(){
+        return beanList.size();
+    }
 
     @Override
     public MCommVH onCreateViewHolder(ViewGroup parent, int viewType) {

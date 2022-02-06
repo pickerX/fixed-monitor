@@ -265,6 +265,8 @@ public class XCamera {
         device.createCaptureSession(targets, callback, handler);
     }
 
+    private long recordingStartMillis =0;
+    private long recordingStopMillis = 0;
     private void start(CameraCaptureSession session, Handler handler) throws CameraAccessException, IOException {
         if (config.preview) {
             // Prevents screen rotation during the video recording
@@ -285,7 +287,7 @@ public class XCamera {
         mRecorder.prepare();
         mRecorder.start();
 
-        long recordingStartMillis = System.currentTimeMillis();
+        recordingStartMillis = System.currentTimeMillis();
         Log.d(TAG, "Flow: 11. Finalizes Recording started at " + recordingStartMillis);
         Log.d(TAG, "Recording started");
 
@@ -302,7 +304,7 @@ public class XCamera {
 
         Log.d(TAG, "Recording stopped. Output file:" + mOutputFile.getAbsolutePath());
         mRecorder.stop();
-        long recordingStopMillis = System.currentTimeMillis();
+        recordingStopMillis = System.currentTimeMillis();
 
         // Removes recording animation
         // fragmentCameraBinding.overlay.removeCallbacks(animationTask);
@@ -312,7 +314,9 @@ public class XCamera {
                 mContext, new String[]{mOutputFile.getAbsolutePath()}, null, null);
 
         // request next recording
-        if (cameraLifecycle != null) cameraLifecycle.onStopped(recordingStopMillis);
+        if (cameraLifecycle != null)
+            cameraLifecycle.onStopped(recordingStopMillis,mOutputFile.getName(),mOutputFile.getAbsolutePath(),mOutputFile.length(),recordingStopMillis-recordingStartMillis);
+
     }
 
     public void restart() {

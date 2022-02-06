@@ -45,4 +45,41 @@
         android:contentDescription="capture"
         android:scaleType="fitCenter" />
 
+    <LinearLayout
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/shape_screenop_bg2"
+        android:layout_marginTop="40dp"
+        >
+<!--        <Space-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="10dp"/>-->
+
+        <TextView
+            android:id="@+id/playback_tv"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:textSize="15sp"
+            android:gravity="center"
+            android:textColor="#ffffffff"
+            android:text="回放"
+            />
+
+        <TextView
+            android:id="@+id/setting_tv"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:textSize="15sp"
+            android:gravity="center"
+            android:textColor="#ffffffff"
+            android:text="设置"
+            />
+
+<!--        <Space-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="10dp"/>-->
+
+    </LinearLayout>
+
 </FrameLayout>

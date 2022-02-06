@@ -1,5 +1,7 @@
 package com.fixed.monitor.base;
 
+import static android.os.Environment.DIRECTORY_DOCUMENTS;
+
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -9,6 +11,8 @@ import android.os.Environment;
 import android.os.Looper;
 import android.util.Log;
 
+
+import com.fixed.monitor.model.App;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -57,6 +61,7 @@ public class CrashExpection implements UncaughtExceptionHandler {
 
 	@Override
 	public void uncaughtException(Thread thread, final Throwable ex) {
+		ex.printStackTrace();
 		if (!handleException(ex) && mDefaultHandler != null) {
 			try {
 				Thread.sleep(5000);
@@ -195,6 +200,7 @@ public class CrashExpection implements UncaughtExceptionHandler {
 		String status = Environment.getExternalStorageState();
 		File dir = null;
 		if (status.equals(Environment.MEDIA_MOUNTED)) {
+//			dir = new File(App.getApp().getExternalFilesDir(DIRECTORY_DOCUMENTS)
 			dir = new File(Environment.getExternalStorageDirectory()
 					+ File.separator + "comfixedmonitor" + File.separator + path);
 			if (!dir.exists()) {

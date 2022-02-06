@@ -13,6 +13,6 @@ public interface CameraLifecycle {
 
     void onStarted(long startMillis);
 
-    void onStopped(long stopMillis);
+    void onStopped(long stopMillis, String name, String path, long size,long duringTime);
 
 }

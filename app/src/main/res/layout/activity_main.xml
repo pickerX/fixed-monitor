@@ -19,26 +19,26 @@
         app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/nav_graph" />
 
-    <TextView
-        android:id="@+id/test_tv"
-        android:layout_width="100dp"
-        android:layout_height="60dp"
-        android:gravity="center"
-        android:text="查看回放"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+<!--    <TextView-->
+<!--        android:id="@+id/test_tv"-->
+<!--        android:layout_width="100dp"-->
+<!--        android:layout_height="60dp"-->
+<!--        android:gravity="center"-->
+<!--        android:text="查看回放"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintLeft_toLeftOf="parent"-->
+<!--        app:layout_constraintRight_toRightOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
 
-    <TextView
-        android:id="@+id/settting_tv"
-        android:layout_width="100dp"
-        android:layout_height="60dp"
-        android:gravity="center"
-        android:text="设置"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/test_tv" />
+<!--    <TextView-->
+<!--        android:id="@+id/settting_tv"-->
+<!--        android:layout_width="100dp"-->
+<!--        android:layout_height="60dp"-->
+<!--        android:gravity="center"-->
+<!--        android:text="设置"-->
+<!--        app:layout_constraintLeft_toLeftOf="parent"-->
+<!--        app:layout_constraintRight_toRightOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/test_tv" />-->
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

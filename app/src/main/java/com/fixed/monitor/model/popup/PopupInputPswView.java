@@ -66,6 +66,7 @@ public class PopupInputPswView extends PopupBaseView {
             public void onClick(View view) {
                 if(PasswordUtil.getPsw(context).equals(mscode_ipv.getNowText())){
                    dismiss();
+                   mscode_ipv.clearText();
                    if(inputPswViewInterface!=null){
                        inputPswViewInterface.success();
                    }
