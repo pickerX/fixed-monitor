@@ -33,6 +33,9 @@ public class ConfigBuilder {
         this.context = context;
     }
 
+    /**
+     * 设置录制时长:分钟
+     */
     public ConfigBuilder setDuration(int duration) {
         this.duration = duration;
         return this;
@@ -86,7 +89,7 @@ public class ConfigBuilder {
         c.directory = directory;
         c.maxReserveSize = maxReserveSize;
         c.cameraOrientation = cameraOrientation;
-
+        c.loop = loop;
         return c;
     }
 

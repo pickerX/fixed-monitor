@@ -8,6 +8,7 @@ import android.os.Message;
 import androidx.annotation.NonNull;
 
 import com.lib.camera.CameraLifecycle;
+import com.lib.camera.CameraUtils;
 import com.lib.camera.XCamera;
 
 /**
@@ -44,6 +45,11 @@ public class MonitorImpl implements Monitor {
             public void onPrepared() {
                 mCamera.start();
                 if (mStateCallback != null) mStateCallback.onPrepared();
+
+                boolean over = CameraUtils.checkLeftSpace(config.maxReserveSize);
+                if (over) {
+                    CameraUtils.clearWith(config.directory, 1);
+                }
             }
 
             @Override
