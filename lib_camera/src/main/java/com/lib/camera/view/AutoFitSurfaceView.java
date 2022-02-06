@@ -1,4 +1,4 @@
-package com.lib.record.view;
+package com.lib.camera.view;
 
 import android.content.Context;
 import android.util.AttributeSet;

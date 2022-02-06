@@ -17,10 +17,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.lib.record.view.AutoFitSurfaceView
+    <com.lib.camera.view.AutoFitSurfaceView
         android:id="@+id/view_finder"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <TextView
+        android:id="@+id/tv_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:text="录制中"
+        android:textColor="@color/white" />
 
     <View
         android:id="@+id/overlay"

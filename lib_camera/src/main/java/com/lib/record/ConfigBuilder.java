@@ -3,7 +3,7 @@ package com.lib.record;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.lib.record.view.AutoFitSurfaceView;
+import com.lib.camera.view.AutoFitSurfaceView;
 
 /**
  * @author pickerx
@@ -24,6 +24,7 @@ public class ConfigBuilder {
      */
     int maxReserveSize;
     boolean preview;
+    boolean loop;
 
     String cameraOrientation;
     AutoFitSurfaceView target;
@@ -66,12 +67,13 @@ public class ConfigBuilder {
         return this;
     }
 
+    public ConfigBuilder setLoop(boolean loop) {
+        this.loop = loop;
+        return this;
+    }
+
     public Config build() {
         Config c = new Config();
-        if (directory == null || directory.isEmpty()) {
-            directory = context.getExternalFilesDir(Monitor.DEFAULT_SAVE_DIR).getAbsolutePath();
-            // directory = Monitor.DEFAULT_SAVE_DIR;
-        }
 
         if (duration <= 0) duration = Monitor.DEFAULT_DURATION;
         if (maxReserveSize <= 0) maxReserveSize = Monitor.DEFAULT_MAX_RESERVE_SIZE;

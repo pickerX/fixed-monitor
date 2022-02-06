@@ -1,4 +1,4 @@
-package com.lib.record;
+package com.lib.camera;
 
 import android.content.Context;
 import android.graphics.Point;
@@ -6,6 +6,8 @@ import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.util.Size;
 import android.view.Display;
+
+import com.lib.record.Monitor;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -18,16 +20,24 @@ import java.util.Locale;
  * @author pickerx
  * @date 2022/1/28 4:34 下午
  */
-public class RecordUtils {
+public class CameraUtils {
+
+    public static File getDefaultDir(Context context, String dir) {
+        return context.getExternalFilesDir(dir);
+    }
 
     public static File createFile(Context context, String dir, String extension) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS", Locale.US);
         String date = sdf.format(new Date());
-        File parent = context.getExternalFilesDir(dir);
-        if (!parent.exists()) {
-            parent.mkdirs();
+        if (dir.equals(Monitor.DEFAULT_SAVE_DIR)) {
+            File parent = getDefaultDir(context, dir);
+            if (!parent.exists()) parent.mkdirs();
+
+            return new File(parent, String.format("VID_%s.%s", date, extension));
+        } else {
+            // 指定目录时
+            return new File(dir, String.format("VID_%s.%s", date, extension));
         }
-        return new File(parent, String.format("VID_%s.%s", date, extension));
     }
 
     /**
@@ -43,6 +53,8 @@ public class RecordUtils {
      * Returns the largest available PREVIEW size. For more information, see:
      * https://d.android.com/reference/android/hardware/camera2/CameraDevice and
      * https://developer.android.com/reference/android/hardware/camera2/params/StreamConfigurationMap
+     *
+     * @param format 根据输出格式获取尺寸
      */
     public static <T> Size getPreviewOutputSize(
             Display display,
@@ -74,7 +86,7 @@ public class RecordUtils {
         Arrays.sort(allSizes, new Comparator<Size>() {
             @Override
             public int compare(Size s1, Size s2) {
-                return s1.getWidth() * s1.getHeight() - s2.getWidth() * s2.getHeight();
+                return s2.getWidth() * s2.getHeight() - s1.getWidth() * s1.getHeight();
             }
         });
         SmartSize[] validSizes = new SmartSize[allSizes.length];
@@ -87,9 +99,9 @@ public class RecordUtils {
             if (validSizes[i].max() <= maxSize.max()
                     && ss.min() <= maxSize.min()) {
                 target = i;
+                break;
             }
         }
-
         return validSizes[target].size;
     }
 

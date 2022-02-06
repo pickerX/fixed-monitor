@@ -2,6 +2,8 @@ package com.lib.record;
 
 import android.content.Context;
 
+import com.lib.camera.CameraLifecycle;
+
 /**
  * 监听器 API
  *
@@ -33,9 +35,22 @@ public interface Monitor {
      * @param context
      * @return true 启动成功，false 失败
      */
-    boolean recordNow(Context context);
+    void recordNow(Context context);
 
+    /**
+     * stop monitoring
+     */
+    void stop();
+
+    /**
+     * 销毁资源，释放 context
+     */
     void release();
+
+    /**
+     * 设置状态回调监听
+     */
+    void setStateCallback(CameraLifecycle callback);
 
     interface Factory {
 

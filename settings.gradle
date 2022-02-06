@@ -9,4 +9,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "FixedMonitor"
 include ':app'
-include ':lib_record'
+include ':lib_camera'
