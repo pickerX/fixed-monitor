@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                popupInputPswView.showCenter(findViewById(R.id.test_tv));
+                popupInputPswView.showCenter(findViewById(R.id.fragment_container));
             }
         }, 300);
     }
