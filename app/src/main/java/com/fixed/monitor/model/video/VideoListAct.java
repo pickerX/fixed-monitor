@@ -32,7 +32,7 @@ public class VideoListAct extends BaseAct {
     private RecyclerView rcv;
     private MCommAdapter<VideoRecordBean> commAdapter;
 
-    private int pageSize =10;
+    private int pageSize = 10;
     private IVideoRecordDao dao;
 
     @Override
@@ -68,7 +68,7 @@ public class VideoListAct extends BaseAct {
             @Override
             public void bindData(Context context, MCommVH mCommVH, int position, VideoRecordBean o) {
 //                GlideUtil.loadMp4Frame(context,o.videoCachePath, (ImageView) mCommVH.getView(R.id.videologo_iv));
-                GlideUtil.loadImageDefult(context,o.videoCover, (ImageView) mCommVH.getView(R.id.videologo_iv));
+                GlideUtil.loadImageDefult(context, o.videoCover, (ImageView) mCommVH.getView(R.id.videologo_iv));
 
 //                MediaMetadataRetriever media = new MediaMetadataRetriever();
 //                media.setDataSource(o.videoCachePath);// videoPath 本地视频的路径
@@ -76,7 +76,7 @@ public class VideoListAct extends BaseAct {
 //                ( (ImageView) (mCommVH.getView(R.id.videologo_iv))).setImageBitmap(bitmap);
 
                 mCommVH.setText(R.id.videoname_tv, o.videoName);
-                mCommVH.setText(R.id.videotime_tv, "时长："+o.videoDuringTime+"秒");
+                mCommVH.setText(R.id.videotime_tv, "时长：" + o.videoDuringTime / 60 / 1000 + "分钟");
                 mCommVH.setText(R.id.videocache_tv, o.videoCachePath);
                 mCommVH.loadImageResourceByGilde(R.id.videologo_iv, o.videoCover);
                 mCommVH.itemView.setOnClickListener(new View.OnClickListener() {
@@ -100,7 +100,6 @@ public class VideoListAct extends BaseAct {
     }
 
 
-
     /**
      * @param
      * @return
@@ -108,12 +107,12 @@ public class VideoListAct extends BaseAct {
      * @author jiejack
      * @time 2022/2/4 9:50 下午
      */
-    public void getData(boolean isRefresh){
-        if(isRefresh){
-            commAdapter.setData(dao.queryByDate_Page(0,pageSize,0,0));
-        }else{
+    public void getData(boolean isRefresh) {
+        if (isRefresh) {
+            commAdapter.setData(dao.queryByDate_Page(0, pageSize, 0, 0));
+        } else {
             int offset = commAdapter.getSize();
-            commAdapter.addData(dao.queryByDate_Page(offset,pageSize,0,0));
+            commAdapter.addData(dao.queryByDate_Page(offset, pageSize, 0, 0));
         }
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -121,7 +120,7 @@ public class VideoListAct extends BaseAct {
                 refreshLayout.finishRefresh();
                 refreshLayout.finishLoadMore();
             }
-        },2000);
+        }, 2000);
     }
 
     @Override
