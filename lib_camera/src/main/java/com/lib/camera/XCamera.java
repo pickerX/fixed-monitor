@@ -323,6 +323,8 @@ public class XCamera {
     }
 
     public void stop() {
+        if (mContext == null) return;
+
         if (config.preview) {
             // Prevents screen rotation during the video recording
             ((Activity) mContext).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
