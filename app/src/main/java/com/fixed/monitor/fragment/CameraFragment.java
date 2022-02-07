@@ -12,7 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.fixed.monitor.MainActivity;
 import com.fixed.monitor.R;
 import com.fixed.monitor.bean.VideoRecordBean;
 import com.fixed.monitor.model.dbdao.IVideoRecordDao;
@@ -100,7 +99,7 @@ public class CameraFragment extends Fragment {
             }
 
             @Override
-            public void onStopped(long stopMillis, String name, String path, long size,long duringTime) {
+            public void onStopped(long stopMillis, String name, String path, long size, long duringTime) {
                 updateStateText("录制结束, 即将开始下一次录制...");
                 try {
                     //视频录制结束插入表
@@ -111,15 +110,10 @@ public class CameraFragment extends Fragment {
                     videoRecordBean.videoCover = "";
                     videoRecordBean.videoDuringTime = duringTime;
                     dao.insert(videoRecordBean);
-                }catch (Exception e){
+                } catch (Exception e) {
 
                 }
             }
-
-//            @Override
-//            public void onStopped(long stopMillis) {
-//
-//            }
         });
         monitor.recordNow(requireContext());
     }

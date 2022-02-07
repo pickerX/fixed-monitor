@@ -85,7 +85,6 @@ public class XCamera {
         cameraThread.start();
         mPreviewSurface = config.target;
         cameraHandler = new Handler(cameraThread.getLooper());
-        initListener();
     }
 
     private int rotation = Surface.ROTATION_0;
@@ -108,6 +107,7 @@ public class XCamera {
     public void prepare(Context context) {
         mContext = context;
         mCameraManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
+        initListener();
         try {
             Log.d(TAG, "Flow: 1. fetch support cameras");
             List<CameraInfo> cameras = enumerateVideoCameras(mCameraManager);

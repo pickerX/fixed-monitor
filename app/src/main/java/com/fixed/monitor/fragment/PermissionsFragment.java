@@ -42,11 +42,11 @@ public class PermissionsFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // request auto launch when boot
-        if (!hasAutoLaunchPermission()) {
-            Intent intent = getAutostartSettingIntent(requireContext());
-            startActivity(intent);
-            return;
-        }
+//        if (!hasAutoLaunchPermission()) {
+//            Intent intent = getAutostartSettingIntent(requireContext());
+//            startActivity(intent);
+//            return;
+//        }
         // Request camera-related permissions
         ActivityResultContracts.RequestMultiplePermissions contract =
                 new ActivityResultContracts.RequestMultiplePermissions();
