@@ -54,9 +54,44 @@
         android:background="#ffeeeeee" />
 
     <RelativeLayout
+        android:id="@+id/savetime_fl"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:background="#ffffffff">
+
+
+        <TextView
+            android:id="@+id/savetime_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="12dp"
+            android:text="60分钟"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tv4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="12dp"
+            android:text="循环录制时长" />
+
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#ffeeeeee" />
+
+    <RelativeLayout
         android:id="@+id/setpsw_fl"
         android:layout_width="match_parent"
         android:layout_height="44dp"
+        android:layout_marginTop="10dp"
         android:background="#ffffffff">
 
         <TextView
