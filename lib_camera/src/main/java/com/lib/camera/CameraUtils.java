@@ -4,13 +4,16 @@ import android.content.Context;
 import android.graphics.Point;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.text.TextUtils;
+import android.util.Log;
 import android.util.Size;
 import android.view.Display;
+import android.view.Surface;
 
 import com.lib.record.Monitor;
+import com.lib.util.StorageUtil;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -108,15 +111,53 @@ public class CameraUtils {
 
     static SmartSize SIZE_1080P = new SmartSize(1920, 1080);
 
+    public static int computeRelativeRotation(
+            CameraCharacteristics characteristics,
+            int surfaceRotation) {
+        int sensorOrientationDegrees =
+                characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
+
+        int deviceOrientationDegrees;
+        switch (surfaceRotation) {
+            case Surface.ROTATION_90:
+                deviceOrientationDegrees = 90;
+                break;
+            case Surface.ROTATION_180:
+                deviceOrientationDegrees = 180;
+                break;
+            case Surface.ROTATION_270:
+                deviceOrientationDegrees = 270;
+                break;
+            default:
+                deviceOrientationDegrees = 0;
+                break;
+        }
+
+        // Reverse device orientation for front-facing cameras
+        int sign = 0;
+        if (characteristics.get(CameraCharacteristics.LENS_FACING) ==
+                CameraCharacteristics.LENS_FACING_FRONT)
+            sign = 1;
+        else sign = -1;
+
+        // Calculate desired JPEG orientation relative to camera orientation to make
+        // the image upright relative to the device orientation
+        return (sensorOrientationDegrees - (deviceOrientationDegrees * sign) + 360) % 360;
+    }
+
     /**
      * 检测剩余的存储大小
      *
-     * @param specSize 最大size
-     * @return true 超过 specSize
+     * @param tfCard tf card root path
+     * @return the space of internal storage or tf card
      */
-    public static boolean checkLeftSpace(int specSize) {
-
-        return false;
+    public static long getLeftSpace(String tfCard) {
+        long space = 0;
+        if (TextUtils.isEmpty(tfCard)) {
+            StorageUtil.Storage s = StorageUtil.fetchStorage();
+            return s.availableSize / 1024;
+        }
+        return space;
     }
 
     /**
@@ -130,13 +171,17 @@ public class CameraUtils {
         if (!file.exists()) return;
 
         // 过滤最旧的视频文件
-        File[] bad = file.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File file, String s) {
-                // 过滤最旧的视频文件
-                return false;
+        File[] bad = file.listFiles();
+        if (bad != null) {
+            Arrays.sort(bad, (f1, f2) -> (int) (f1.lastModified() - f2.lastModified()));
+            int count = 0;
+            for (File f : bad) {
+                count++;
+                if (count > number) break;
+                f.delete();
             }
-        });
+            Log.d("Storage", "delete files:" + count);
+        }
     }
 }
 

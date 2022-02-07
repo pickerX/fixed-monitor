@@ -33,9 +33,7 @@ public class MonitorImpl implements Monitor {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-
             if (msg.what == MSG_WHAT_TRY_TO_STOP) tryToStop();
-
         }
     };
 
@@ -46,8 +44,8 @@ public class MonitorImpl implements Monitor {
                 mCamera.start();
                 if (mStateCallback != null) mStateCallback.onPrepared();
 
-                boolean over = CameraUtils.checkLeftSpace(config.maxReserveSize);
-                if (over) {
+                long size = CameraUtils.getLeftSpace(null);
+                if (size < config.maxReserveSize) {
                     CameraUtils.clearWith(config.directory, 1);
                 }
             }
@@ -61,17 +59,13 @@ public class MonitorImpl implements Monitor {
             }
 
             @Override
-            public void onStopped(long stopMillis, String name, String path, long size,long duringTime,String coverPath) {
-                if (mStateCallback != null) mStateCallback.onStopped(stopMillis,name,path,size,duringTime,coverPath);
+            public void onStopped(long stopMillis, String name, String path, long size,long duringTime) {
+                if (mStateCallback != null)
+                    mStateCallback.onStopped(stopMillis,name,path,size,duringTime,coverPath);
                 if (config.loop) {
                     dispatchNext();
                 }
             }
-
-//            @Override
-//            public void onStopped(long stopMillis) {
-//
-//            }
         };
         this.mCamera.bindLifecycle(callback);
     }
