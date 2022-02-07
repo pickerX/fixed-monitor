@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
@@ -12,6 +13,7 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.MediaCodec;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaRecorder;
 import android.media.MediaScannerConnection;
 import android.os.Build;
@@ -31,6 +33,8 @@ import com.lib.record.Config;
 import com.lib.record.Monitor;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -335,9 +339,30 @@ public class XCamera {
         MediaScannerConnection.scanFile(
                 mContext, new String[]{mOutputFile.getAbsolutePath()}, null, null);
 
+        //保存第一帧图片
+        String cover = mOutputFile.getAbsolutePath().replace(mOutputFile.getName(),"")+ mOutputFile.getName() + ".jpg";
+        try{
+            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+            retriever.setDataSource(mOutputFile.getAbsolutePath());
+            Bitmap bitmap = retriever.getFrameAtTime();
+            FileOutputStream outStream = null;
+            try {
+                outStream = new FileOutputStream(new File(cover));
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 10, outStream);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            try {
+                outStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            retriever.release();
+        }catch (Exception e){
+        }
         // request next recording
         if (cameraLifecycle != null)
-            cameraLifecycle.onStopped(recordingStopMillis, mOutputFile.getName(), mOutputFile.getAbsolutePath(), mOutputFile.length(), recordingStopMillis - recordingStartMillis);
+            cameraLifecycle.onStopped(recordingStopMillis,mOutputFile.getName(),mOutputFile.getAbsolutePath(),mOutputFile.length(),recordingStopMillis-recordingStartMillis,cover);
 
     }
 

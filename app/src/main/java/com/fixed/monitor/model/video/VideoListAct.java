@@ -1,8 +1,11 @@
 package com.fixed.monitor.model.video;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.media.MediaMetadataRetriever;
 import android.os.Handler;
 import android.view.View;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -17,6 +20,7 @@ import com.fixed.monitor.bean.VideoRecordBean;
 import com.fixed.monitor.model.dbdao.IVideoRecordDao;
 import com.fixed.monitor.model.dbdao.impl.VideoRecordDaoImpl;
 import com.fixed.monitor.util.DataUtil;
+import com.fixed.monitor.util.GlideUtil;
 import com.scwang.smart.refresh.layout.SmartRefreshLayout;
 import com.scwang.smart.refresh.layout.api.RefreshLayout;
 import com.scwang.smart.refresh.layout.listener.OnLoadMoreListener;
@@ -63,6 +67,14 @@ public class VideoListAct extends BaseAct {
 
             @Override
             public void bindData(Context context, MCommVH mCommVH, int position, VideoRecordBean o) {
+//                GlideUtil.loadMp4Frame(context,o.videoCachePath, (ImageView) mCommVH.getView(R.id.videologo_iv));
+                GlideUtil.loadImageDefult(context,o.videoCover, (ImageView) mCommVH.getView(R.id.videologo_iv));
+
+//                MediaMetadataRetriever media = new MediaMetadataRetriever();
+//                media.setDataSource(o.videoCachePath);// videoPath 本地视频的路径
+//                Bitmap bitmap  = media.getFrameAtTime(1, MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
+//                ( (ImageView) (mCommVH.getView(R.id.videologo_iv))).setImageBitmap(bitmap);
+
                 mCommVH.setText(R.id.videoname_tv, o.videoName);
                 mCommVH.setText(R.id.videotime_tv, "时长："+o.videoDuringTime+"秒");
                 mCommVH.setText(R.id.videocache_tv, o.videoCachePath);

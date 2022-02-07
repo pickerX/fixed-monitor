@@ -42,6 +42,8 @@
             android:configChanges="orientation|screenSize|keyboardHidden" />
         <activity android:name=".model.video.VideoListAct" />
         <activity android:name=".model.setting.SettingAct" />
+        <activity android:name=".model.log.LogListAct" />
+        <activity android:name=".model.log.LogDetailAct" />
 
         <receiver
             android:name=".AutoLaunchReceiver"
@@ -51,6 +53,17 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
+
+        <provider
+            android:name=".base.MyFileProvider"
+            android:authorities="com.fixed.monitor.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+        </provider>
+
     </application>
 
 </manifest>

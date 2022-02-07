@@ -3,6 +3,7 @@ package com.fixed.monitor.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -99,7 +100,7 @@ public class CameraFragment extends Fragment {
             }
 
             @Override
-            public void onStopped(long stopMillis, String name, String path, long size, long duringTime) {
+            public void onStopped(long stopMillis, String name, String path, long size, long duringTime,String coverPath) {
                 updateStateText("录制结束, 即将开始下一次录制...");
                 try {
                     //视频录制结束插入表
@@ -107,11 +108,11 @@ public class CameraFragment extends Fragment {
                     videoRecordBean.videoName = name;
                     videoRecordBean.videoCachePath = path;
                     videoRecordBean.videoSize = size;
-                    videoRecordBean.videoCover = "";
+                    videoRecordBean.videoCover = coverPath;
                     videoRecordBean.videoDuringTime = duringTime;
                     dao.insert(videoRecordBean);
                 } catch (Exception e) {
-
+                    e.printStackTrace();
                 }
             }
         });

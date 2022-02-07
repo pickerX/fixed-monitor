@@ -59,9 +59,9 @@ public class MonitorImpl implements Monitor {
             }
 
             @Override
-            public void onStopped(long stopMillis, String name, String path, long size, long duringTime) {
+            public void onStopped(long stopMillis, String name, String path, long size,long duringTime,String coverPath) {
                 if (mStateCallback != null)
-                    mStateCallback.onStopped(stopMillis, name, path, size, duringTime);
+                    mStateCallback.onStopped(stopMillis,name,path,size,duringTime,coverPath);
                 if (config.loop) {
                     dispatchNext();
                 }

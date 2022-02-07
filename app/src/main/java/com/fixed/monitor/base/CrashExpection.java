@@ -59,15 +59,19 @@ public class CrashExpection implements UncaughtExceptionHandler {
 		Thread.setDefaultUncaughtExceptionHandler(this);
 	}
 
+	public String getPath() {
+		return path;
+	}
+
 	@Override
 	public void uncaughtException(Thread thread, final Throwable ex) {
 		ex.printStackTrace();
 		if (!handleException(ex) && mDefaultHandler != null) {
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-				Log.e(TAG, "error : ", e);
-			}
+//			try {
+//				Thread.sleep(5000);
+//			} catch (InterruptedException e) {
+//				Log.e(TAG, "error : ", e);
+//			}
 			// 用来存储设备信息和异常信息
 			mDefaultHandler.uncaughtException(thread, ex);
 		} else {
