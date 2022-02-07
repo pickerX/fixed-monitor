@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
     tools:context=".MainActivity">
 
     <androidx.fragment.app.FragmentContainerView
@@ -19,26 +20,79 @@
         app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/nav_graph" />
 
-<!--    <TextView-->
-<!--        android:id="@+id/test_tv"-->
-<!--        android:layout_width="100dp"-->
-<!--        android:layout_height="60dp"-->
-<!--        android:gravity="center"-->
-<!--        android:text="查看回放"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintLeft_toLeftOf="parent"-->
-<!--        app:layout_constraintRight_toRightOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent" />-->
+    <!--    <TextView-->
+    <!--        android:id="@+id/test_tv"-->
+    <!--        android:layout_width="100dp"-->
+    <!--        android:layout_height="60dp"-->
+    <!--        android:gravity="center"-->
+    <!--        android:text="查看回放"-->
+    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--        app:layout_constraintLeft_toLeftOf="parent"-->
+    <!--        app:layout_constraintRight_toRightOf="parent"-->
+    <!--        app:layout_constraintTop_toTopOf="parent" />-->
 
-<!--    <TextView-->
-<!--        android:id="@+id/settting_tv"-->
-<!--        android:layout_width="100dp"-->
-<!--        android:layout_height="60dp"-->
-<!--        android:gravity="center"-->
-<!--        android:text="设置"-->
-<!--        app:layout_constraintLeft_toLeftOf="parent"-->
-<!--        app:layout_constraintRight_toRightOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@id/test_tv" />-->
+    <!--    <TextView-->
+    <!--        android:id="@+id/settting_tv"-->
+    <!--        android:layout_width="100dp"-->
+    <!--        android:layout_height="60dp"-->
+    <!--        android:gravity="center"-->
+    <!--        android:text="设置"-->
+    <!--        app:layout_constraintLeft_toLeftOf="parent"-->
+    <!--        app:layout_constraintRight_toRightOf="parent"-->
+    <!--        app:layout_constraintTop_toBottomOf="@id/test_tv" />-->
+
+
+    <FrameLayout
+        android:id="@+id/psw_fl"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#55000000">
+
+        <LinearLayout
+            android:layout_width="335dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/shape_ffffff_r10"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:text="请输入密码"
+                android:textColor="#ff333333"
+                android:textSize="18sp" />
+
+            <com.fixed.monitor.view.MsCodeInputView
+                android:id="@+id/mscode_ipv"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginRight="20dp" />
+
+
+            <TextView
+                android:id="@+id/commit_tv"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/selector_paypassword_commitbtn_bg"
+                android:enabled="false"
+                android:gravity="center"
+                android:text="确认"
+                android:textColor="@drawable/selector_paypassword_commitbtn_tc"
+                android:textSize="14sp" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="20dp" />
+
+        </LinearLayout>
+    </FrameLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
