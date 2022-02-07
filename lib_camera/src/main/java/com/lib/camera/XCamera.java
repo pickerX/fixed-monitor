@@ -20,6 +20,7 @@ import android.os.HandlerThread;
 import android.util.Log;
 import android.util.Range;
 import android.util.Size;
+import android.view.OrientationEventListener;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
@@ -84,6 +85,24 @@ public class XCamera {
         cameraThread.start();
         mPreviewSurface = config.target;
         cameraHandler = new Handler(cameraThread.getLooper());
+        initListener();
+    }
+
+    private int rotation = Surface.ROTATION_0;
+
+    private void initListener() {
+        // Sets output orientation based on current sensor value at start time
+        OrientationEventListener listener = new OrientationEventListener(mContext) {
+            @Override
+            public void onOrientationChanged(int orientation) {
+                if (orientation <= 45) rotation = Surface.ROTATION_0;
+                if (orientation <= 135) rotation = Surface.ROTATION_90;
+                if (orientation <= 225) rotation = Surface.ROTATION_180;
+                if (orientation <= 315) rotation = Surface.ROTATION_270;
+                else rotation = Surface.ROTATION_0;
+            }
+        };
+        listener.enable();
     }
 
     public void prepare(Context context) {
@@ -92,7 +111,7 @@ public class XCamera {
         try {
             Log.d(TAG, "Flow: 1. fetch support cameras");
             List<CameraInfo> cameras = enumerateVideoCameras(mCameraManager);
-            // get base camera for now
+            // get best camera for now
             mFront = cameras.get(0);
             Log.d(TAG, "Flow: 2. find best camera:" + mFront);
             mCharacteristics = mCameraManager.getCameraCharacteristics(mFront.cameraId);
@@ -122,11 +141,9 @@ public class XCamera {
                         return;
                     }
                     Log.d(TAG, "Flow: 4. find best preview size:" + previewSize);
-                    Log.d(TAG, "View finder size:" +
-                            surfaceHolder.getSurfaceFrame().width() +
-                            " x " + surfaceHolder.getSurfaceFrame().height());
                     try {
-                        mPreviewSurface.setAspectRatio(previewSize.getHeight(), previewSize.getWidth());
+                        mPreviewSurface.setAspectRatio(previewSize.getHeight(),
+                                previewSize.getWidth());
                         // To ensure that size is set, initialize camera in the view's thread
                         if (cameraLifecycle != null) cameraLifecycle.onPrepared();
                     } catch (IllegalAccessException e) {
@@ -150,6 +167,7 @@ public class XCamera {
             e.printStackTrace();
             Log.e(TAG, "MediaRecorder prepare failed");
         }
+
     }
 
     public void start() {
@@ -267,8 +285,9 @@ public class XCamera {
         device.createCaptureSession(targets, callback, handler);
     }
 
-    private long recordingStartMillis =0;
+    private long recordingStartMillis = 0;
     private long recordingStopMillis = 0;
+
     private void start(CameraCaptureSession session, Handler handler) throws CameraAccessException, IOException {
         if (config.preview) {
             // Prevents screen rotation during the video recording
@@ -278,14 +297,15 @@ public class XCamera {
         // repeating requests without having to explicitly call `session.stopRepeating`
         session.setRepeatingRequest(mRecordRequest, null, handler);
         // Finalizes recorder setup and starts recording
-        mRecorder = createRecorder(mRecordSurface, mFront.fps,
+        mRecorder = createRecorder(mRecordSurface,
+                mFront.fps,
                 mFront.size.getWidth(),
                 mFront.size.getHeight(),
                 mOutputFile.getAbsolutePath());
-        // Sets output orientation based on current sensor value at start time
-//        recorder.relativeOrientation.value ?.let {
-//            setOrientationHint(it);
-//        }
+        // rotate by orientation
+        int orientation = CameraUtils.computeRelativeRotation(mCharacteristics, rotation);
+        Log.d(TAG, "record orientation:" + orientation);
+        mRecorder.setOrientationHint(orientation);
         mRecorder.prepare();
         mRecorder.start();
 
@@ -317,7 +337,7 @@ public class XCamera {
 
         // request next recording
         if (cameraLifecycle != null)
-            cameraLifecycle.onStopped(recordingStopMillis,mOutputFile.getName(),mOutputFile.getAbsolutePath(),mOutputFile.length(),recordingStopMillis-recordingStartMillis);
+            cameraLifecycle.onStopped(recordingStopMillis, mOutputFile.getName(), mOutputFile.getAbsolutePath(), mOutputFile.length(), recordingStopMillis - recordingStartMillis);
 
     }
 
