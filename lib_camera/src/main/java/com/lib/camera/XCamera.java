@@ -342,8 +342,8 @@ public class XCamera {
                 mContext, new String[]{mOutputFile.getAbsolutePath()}, null, null);
 
         //保存第一帧图片
-        String cover = mOutputFile.getAbsolutePath().replace(mOutputFile.getName(),"")+ mOutputFile.getName() + ".jpg";
-        try{
+        String cover = mOutputFile.getAbsolutePath().replace(mOutputFile.getName(), "") + mOutputFile.getName() + ".jpg";
+        try {
             MediaMetadataRetriever retriever = new MediaMetadataRetriever();
             retriever.setDataSource(mOutputFile.getAbsolutePath());
             Bitmap bitmap = retriever.getFrameAtTime();
@@ -360,11 +360,11 @@ public class XCamera {
                 e.printStackTrace();
             }
             retriever.release();
-        }catch (Exception e){
+        } catch (Exception e) {
         }
         // request next recording
         if (cameraLifecycle != null)
-            cameraLifecycle.onStopped(recordingStopMillis,mOutputFile.getName(),mOutputFile.getAbsolutePath(),mOutputFile.length(),recordingStopMillis-recordingStartMillis,cover);
+            cameraLifecycle.onStopped(recordingStopMillis, mOutputFile.getName(), mOutputFile.getAbsolutePath(), mOutputFile.length(), recordingStopMillis - recordingStartMillis, cover);
 
     }
 

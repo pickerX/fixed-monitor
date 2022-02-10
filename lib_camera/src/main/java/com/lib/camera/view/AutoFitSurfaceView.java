@@ -39,7 +39,7 @@ public class AutoFitSurfaceView extends SurfaceView {
         if (width < 0 || height < 0) {
             throw new IllegalAccessException("Size cannot be negative");
         }
-        aspectRatio = (float) (width / height * 1.0);
+        aspectRatio = (float) width / (float) height;
         getHolder().setFixedSize(width, height);
         requestLayout();
     }
@@ -61,6 +61,7 @@ public class AutoFitSurfaceView extends SurfaceView {
                 actualRatio = aspectRatio;
             else
                 actualRatio = 1f / aspectRatio;
+
             if (width < height * actualRatio) {
                 newHeight = height;
                 newWidth = Math.round(height * actualRatio);
@@ -70,7 +71,7 @@ public class AutoFitSurfaceView extends SurfaceView {
             }
 
             Log.d("AutoFitSurfaceView",
-                    "Measured dimensions set: $newWidth x $newHeight");
+                    "Measured dimensions set: " + newWidth + "x" + newHeight);
             setMeasuredDimension(newWidth, newHeight);
         }
     }
