@@ -146,8 +146,8 @@ public class XCamera {
                     }
                     Log.d(TAG, "Flow: 4. find best preview size:" + previewSize);
                     try {
-                        mPreviewSurface.setAspectRatio(previewSize.getHeight(),
-                                previewSize.getWidth());
+                        mPreviewSurface.setAspectRatio(previewSize.getWidth(),
+                                previewSize.getHeight());
                         // To ensure that size is set, initialize camera in the view's thread
                         if (cameraLifecycle != null) cameraLifecycle.onPrepared();
                     } catch (IllegalAccessException e) {
