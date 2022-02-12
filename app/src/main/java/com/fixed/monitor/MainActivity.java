@@ -1,9 +1,12 @@
 package com.fixed.monitor;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -18,6 +21,7 @@ import androidx.navigation.Navigation;
 import com.fixed.monitor.model.popup.PopupInputPswView;
 import com.fixed.monitor.model.setting.SettingAct;
 import com.fixed.monitor.model.video.VideoListAct;
+import com.fixed.monitor.service.MonitorService;
 import com.fixed.monitor.util.PasswordUtil;
 import com.fixed.monitor.util.T;
 import com.fixed.monitor.view.MsCodeInputView;
@@ -36,11 +40,25 @@ public class MainActivity extends AppCompatActivity {
     private ImageView[] tab_iv = new ImageView[3];
     private TextView[] tab_tv = new TextView[3];
 
+    public MonitorService monitorService;
+    private ServiceConnection coreServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            monitorService = null;
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            monitorService = ((MonitorService.MonitorServiceBinder) service).getService();
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        bindService(MonitorService.getIntent(), coreServiceConnection, Context.BIND_AUTO_CREATE);
         mFragment = findViewById(R.id.fragment_container);
 
         tab_ll[0] = findViewById(R.id.tab1_ll);
@@ -66,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
                                 navHostController.navigate(R.id.camera_fragment);
                                 break;
                             case R.id.tab2_ll:
+                                startActivity(new Intent(MainActivity.this, VideoListAct.class));
                                 break;
                             case R.id.tab3_ll:
                                 navHostController.navigate(R.id.setting_fragment);
@@ -131,5 +150,13 @@ public class MainActivity extends AppCompatActivity {
                         View.SYSTEM_UI_FLAG_FULLSCREEN |
                         View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
                         View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(monitorService!=null){
+            unbindService(coreServiceConnection);
+        }
     }
 }

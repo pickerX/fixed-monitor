@@ -1,6 +1,7 @@
 package com.fixed.monitor.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.View;
 import android.widget.TextView;
 
@@ -14,6 +15,7 @@ import com.fixed.monitor.base.adapter.MCommAdapter;
 import com.fixed.monitor.base.adapter.MCommVH;
 import com.fixed.monitor.bean.LogBean;
 import com.fixed.monitor.model.log.LogDetailAct;
+import com.fixed.monitor.model.log.LogListAct;
 import com.fixed.monitor.model.popup.PopupInputPswView;
 import com.fixed.monitor.model.popup.PopupSetPswView;
 import com.fixed.monitor.model.popup.PopupSetVideoTimeView;
@@ -105,7 +107,8 @@ public class SettingFragment extends BaseFragment {
                             setPsw_rl.setVisibility(View.VISIBLE);
                             break;
                         case R.id.setting_ll4://系统日志
-                            loglist_rcv.setVisibility(View.VISIBLE);
+//                            loglist_rcv.setVisibility(View.VISIBLE);
+                            startActivity(new Intent(getContext(), LogListAct.class));
                             break;
                     }
                 }

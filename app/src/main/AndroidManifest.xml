@@ -48,6 +48,8 @@
         <activity android:name=".model.log.LogListAct" />
         <activity android:name=".model.log.LogDetailAct" />
 
+        <service android:name="com.fixed.monitor.service.MonitorService" />
+
         <receiver
             android:name=".AutoLaunchReceiver"
             android:exported="true">

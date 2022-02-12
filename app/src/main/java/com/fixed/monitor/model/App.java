@@ -2,9 +2,11 @@ package com.fixed.monitor.model;
 
 import android.app.Application;
 import android.content.Context;
+import android.os.Build;
 
 import com.fixed.monitor.base.CrashExpection;
 import com.fixed.monitor.base.DatabaseHelper;
+import com.fixed.monitor.service.MonitorService;
 import com.fixed.monitor.util.VideoPathUtil;
 import com.scwang.smart.refresh.footer.ClassicsFooter;
 import com.scwang.smart.refresh.header.ClassicsHeader;
@@ -53,12 +55,13 @@ public class App extends Application {
         initVideoPlayer();
         initSmartRefreshLayout();
         initVideoRecordParameter();
+        initDataService();
     }
 
     /**
+     * @param
+     * @return
      * @description 初始化录制参数
-     * @param 
-     * @return 
      * @author jieja
      * @time 2022/2/7 14:53
      */
@@ -116,6 +119,18 @@ public class App extends Application {
             }
         }
         return dbinstance;
+    }
+
+
+    /**
+     * 启动服务
+     */
+    private void initDataService() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(MonitorService.getIntent(this));
+        } else {
+            startService(MonitorService.getIntent(this));//启动数据服务
+        }
     }
 
 }

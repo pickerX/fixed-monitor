@@ -295,7 +295,7 @@ public class XCamera {
     private void start(CameraCaptureSession session, Handler handler) throws CameraAccessException, IOException {
         if (config.preview) {
             // Prevents screen rotation during the video recording
-            ((Activity) mContext).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
+//            ((Activity) mContext).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
         }
         // Start recording repeating requests, which will stop the ongoing preview
         // repeating requests without having to explicitly call `session.stopRepeating`
@@ -327,7 +327,7 @@ public class XCamera {
 
         if (config.preview) {
             // Prevents screen rotation during the video recording
-            ((Activity) mContext).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
+//            ((Activity) mContext).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
         }
 
         Log.d(TAG, "Recording stopped. Output file:" + mOutputFile.getAbsolutePath());
