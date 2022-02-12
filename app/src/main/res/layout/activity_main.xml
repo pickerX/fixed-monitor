@@ -10,15 +10,116 @@
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container"
         android:name="androidx.navigation.fragment.NavHostFragment"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
         android:keepScreenOn="true"
         app:defaultNavHost="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/left_tabbar"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/nav_graph" />
+
+    <LinearLayout
+        android:id="@+id/left_tabbar"
+        android:layout_width="98dp"
+        android:layout_height="match_parent"
+        android:background="#ff333333"
+        android:orientation="vertical"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="#ff1890FF">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@mipmap/ic_logo_apha" />
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:id="@+id/tab1_ll"
+            android:layout_width="98dp"
+            android:layout_height="98dp"
+            android:background="@drawable/selector_tab_mbg_color"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/tab1_iv"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/selector_tab_main_1" />
+
+            <TextView
+                android:id="@+id/tab1_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="监控"
+                android:textColor="@drawable/selector_tab_text_color"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/tab2_ll"
+            android:layout_width="98dp"
+            android:layout_height="98dp"
+            android:background="@drawable/selector_tab_mbg_color"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/tab2_iv"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/selector_tab_main_2" />
+
+            <TextView
+                android:id="@+id/tab2_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="回放"
+                android:textColor="@drawable/selector_tab_text_color"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/tab3_ll"
+            android:layout_width="98dp"
+            android:layout_height="98dp"
+            android:background="@drawable/selector_tab_mbg_color"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/tab3_iv"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/selector_tab_main_3" />
+
+            <TextView
+                android:id="@+id/tab3_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="设置"
+                android:textColor="@drawable/selector_tab_text_color"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
 
     <!--    <TextView-->
     <!--        android:id="@+id/test_tv"-->
@@ -42,57 +143,56 @@
     <!--        app:layout_constraintTop_toBottomOf="@id/test_tv" />-->
 
 
-    <FrameLayout
-        android:id="@+id/psw_fl"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#55000000">
+    <!--    <FrameLayout-->
+    <!--        android:id="@+id/psw_fl"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent"-->
+    <!--        android:visibility="gone"-->
+    <!--        android:background="#55000000">-->
 
-        <LinearLayout
-            android:layout_width="335dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:background="@drawable/shape_ffffff_r10"
-            android:orientation="vertical">
+    <!--        <LinearLayout-->
+    <!--            android:layout_width="335dp"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:layout_gravity="center"-->
+    <!--            android:background="@drawable/shape_ffffff_r10"-->
+    <!--            android:orientation="vertical">-->
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="20dp"
-                android:text="请输入密码"
-                android:textColor="#ff333333"
-                android:textSize="18sp" />
+    <!--            <TextView-->
+    <!--                android:layout_width="wrap_content"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:layout_gravity="center"-->
+    <!--                android:layout_marginTop="20dp"-->
+    <!--                android:text="请输入密码"-->
+    <!--                android:textColor="#ff333333"-->
+    <!--                android:textSize="18sp" />-->
 
-            <com.fixed.monitor.view.MsCodeInputView
-                android:id="@+id/mscode_ipv"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="30dp"
-                android:layout_marginRight="20dp" />
-
-
-            <TextView
-                android:id="@+id/commit_tv"
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="30dp"
-                android:layout_marginRight="20dp"
-                android:background="@drawable/selector_paypassword_commitbtn_bg"
-                android:enabled="false"
-                android:gravity="center"
-                android:text="确认"
-                android:textColor="@drawable/selector_paypassword_commitbtn_tc"
-                android:textSize="14sp" />
-
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="20dp" />
-
-        </LinearLayout>
-    </FrameLayout>
+    <!--            <com.fixed.monitor.view.MsCodeInputView-->
+    <!--                android:id="@+id/mscode_ipv"-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="50dp"-->
+    <!--                android:layout_marginLeft="20dp"-->
+    <!--                android:layout_marginTop="30dp"-->
+    <!--                android:layout_marginRight="20dp" />-->
 
 
+    <!--            <TextView-->
+    <!--                android:id="@+id/commit_tv"-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="44dp"-->
+    <!--                android:layout_marginLeft="20dp"-->
+    <!--                android:layout_marginTop="30dp"-->
+    <!--                android:layout_marginRight="20dp"-->
+    <!--                android:background="@drawable/selector_paypassword_commitbtn_bg"-->
+    <!--                android:enabled="false"-->
+    <!--                android:gravity="center"-->
+    <!--                android:text="确认"-->
+    <!--                android:textColor="@drawable/selector_paypassword_commitbtn_tc"-->
+    <!--                android:textSize="14sp" />-->
+
+    <!--            <Space-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="20dp" />-->
+
+    <!--        </LinearLayout>-->
+    <!--</FrameLayout>-->
 </androidx.constraintlayout.widget.ConstraintLayout>
