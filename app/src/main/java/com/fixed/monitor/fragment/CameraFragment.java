@@ -161,7 +161,7 @@ public class CameraFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        viewfl.removeAllViews();
+//        viewfl.removeAllViews();
         if (((MainActivity) getContext()).monitorService != null) {
             ((MainActivity) getContext()).monitorService.bindMonitorView(viewfl);
         }
@@ -170,7 +170,7 @@ public class CameraFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        viewfl.removeAllViews();
+//        viewfl.removeAllViews();
         if (((MainActivity) getContext()).monitorService != null) {
             ((MainActivity) getContext()).monitorService.unBindMonitorView(viewfl);
         }

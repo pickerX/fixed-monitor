@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ff000000"
+    >
+
+    <com.lib.camera.view.AutoFitSurfaceView
+        android:id="@+id/view_finder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="32dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        >
+
+        <TextView
+            android:id="@+id/record_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="REC"
+            android:textColor="#ffed1f23"
+            android:textSize="24sp"
+            android:visibility="gone"
+            />
+
+        <View
+            android:id="@+id/record_view"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginLeft="12dp"
+            android:background="@drawable/shape_red_oval"
+            android:visibility="gone"
+            />
+
+        <TextView
+            android:id="@+id/state_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:text="录制中"
+            android:textColor="#ffffffff"
+            android:textSize="24sp"/>
+    </LinearLayout>
+
+
+
+</FrameLayout>
