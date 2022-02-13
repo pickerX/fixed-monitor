@@ -26,6 +26,8 @@ public class AutoFitSurfaceView extends SurfaceView {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
+    private int maxWidth;
+    private int maxHeight;
     private float aspectRatio = 0f;
 
     /**
@@ -41,6 +43,13 @@ public class AutoFitSurfaceView extends SurfaceView {
         }
         aspectRatio = (float) width / (float) height;
         getHolder().setFixedSize(width, height);
+        requestLayout();
+    }
+
+
+    public void setMaxSize(int maxWidth, int maxHeight) {
+        this.maxWidth = maxWidth < 0 ? 0 : maxWidth;
+        this.maxHeight = maxHeight < 0 ? 0 : maxHeight;
         requestLayout();
     }
 
@@ -62,12 +71,23 @@ public class AutoFitSurfaceView extends SurfaceView {
             else
                 actualRatio = 1f / aspectRatio;
 
-            if (width < height * actualRatio) {
-                newHeight = height;
-                newWidth = Math.round(height * actualRatio);
+            if (width < height) {
+                if (maxHeight != 0 && height > maxHeight) {
+                    newHeight = maxHeight;
+                    newWidth = Math.round(maxHeight * actualRatio);
+                } else {
+                    newHeight = height;
+                    newWidth = Math.round(height * actualRatio);
+                }
             } else {
-                newWidth = width;
-                newHeight = Math.round(width / actualRatio);
+                if (maxWidth != 0 && width > maxWidth) {
+                    newWidth = maxWidth;
+                    newHeight = Math.round(maxWidth / actualRatio);
+                } else {
+                    newWidth = width;
+                    newHeight = Math.round(width / actualRatio);
+                }
+
             }
 
             Log.d("AutoFitSurfaceView",

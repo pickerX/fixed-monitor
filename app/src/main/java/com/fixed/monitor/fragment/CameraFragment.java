@@ -148,17 +148,35 @@ public class CameraFragment extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (((MainActivity) getContext()).monitorService != null) {
-                    ((MainActivity) getContext()).monitorService.bindMonitorView(viewfl);
-                }
-            }
-        }, 1000);
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                if (((MainActivity) getContext()).monitorService != null) {
+//                    ((MainActivity) getContext()).monitorService.bindMonitorView(viewfl);
+//                }
+//            }
+//        }, 1000);
     }
 
-//    public void startCountDown() {
+    @Override
+    public void onResume() {
+        super.onResume();
+        viewfl.removeAllViews();
+        if (((MainActivity) getContext()).monitorService != null) {
+            ((MainActivity) getContext()).monitorService.bindMonitorView(viewfl);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        viewfl.removeAllViews();
+        if (((MainActivity) getContext()).monitorService != null) {
+            ((MainActivity) getContext()).monitorService.unBindMonitorView(viewfl);
+        }
+    }
+
+    //    public void startCountDown() {
 //        if (null != mCountDownExecutor) {
 //            mCountDownExecutor.shutdownNow();
 //        }
@@ -192,6 +210,7 @@ public class CameraFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        viewfl.removeAllViews();
         EventBus.getDefault().unregister(this);
 //        if (mCountDownExecutor != null) {
 //            mCountDownExecutor.shutdownNow();

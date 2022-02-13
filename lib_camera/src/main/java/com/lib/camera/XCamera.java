@@ -303,8 +303,8 @@ public class XCamera {
         // Finalizes recorder setup and starts recording
         mRecorder = createRecorder(mRecordSurface,
                 mFront.fps,
-                mFront.size.getWidth(),
-                mFront.size.getHeight(),
+                mFront.size.getWidth() > 1920 ? 1920 : mFront.size.getWidth(),
+                mFront.size.getHeight() > 1080 ? 1080 : mFront.size.getHeight(),
                 mOutputFile.getAbsolutePath());
         // rotate by orientation
         int orientation = CameraUtils.computeRelativeRotation(mCharacteristics, rotation);
@@ -386,8 +386,8 @@ public class XCamera {
             surface = MediaCodec.createPersistentInputSurface();
             MediaRecorder mr = createRecorder(surface,
                     front.fps,
-                    front.size.getWidth(),
-                    front.size.getHeight(),
+                    front.size.getWidth() > 1920 ? 1920 : front.size.getWidth(),
+                    front.size.getHeight() > 1080 ? 1080 : front.size.getHeight(),
                     mOutputFile.getAbsolutePath());
             mr.prepare();
             mr.release();

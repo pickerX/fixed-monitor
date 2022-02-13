@@ -51,8 +51,8 @@ public class SettingFragment extends BaseFragment {
         views[3] = view.findViewById(R.id.setting_ll4);
 
         setpath_fl = view.findViewById(R.id.setpath_fl);
-        setDuringTime_rl = view.findViewById(R.id.setpath_fl);
-        setPsw_rl = view.findViewById(R.id.setpath_fl);
+        setDuringTime_rl = view.findViewById(R.id.setDuringTime_rl);
+        setPsw_rl = view.findViewById(R.id.setPsw_rl);
 
         popupInputPswView = new PopupInputPswView(getContext(),
                 new PopupInputPswView.PopupInputPswViewInterface() {
