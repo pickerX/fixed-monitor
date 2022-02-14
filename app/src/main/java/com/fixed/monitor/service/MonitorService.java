@@ -231,6 +231,7 @@ public class MonitorService extends Service {
         //获取WindowManager对象
         mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         mWindowManager.addView(windowMainView, mWindowManagerParams);
+
     }
 
     public void startCountDown() {
@@ -285,9 +286,9 @@ public class MonitorService extends Service {
 
 
     public void unBindMonitorView(ViewGroup viewfl) {
-        mWindowManagerParams.x = 10;
+        mWindowManagerParams.x = MeasureUtil.dip2px(this,98);
         mWindowManagerParams.y = 100;
-        mWindowManagerParams.gravity = Gravity.BOTTOM | Gravity.RIGHT;
+        mWindowManagerParams.gravity = Gravity.BOTTOM | Gravity.LEFT;
         mWindowManagerParams.width = smallWidth;
         mWindowManagerParams.height = smallHeight;
         mAutoFitSurfaceView.setMaxSize(smallWidth, smallHeight);
@@ -297,6 +298,7 @@ public class MonitorService extends Service {
     public void refreshRecordUI() {
 
     }
+
 
 
     @Override

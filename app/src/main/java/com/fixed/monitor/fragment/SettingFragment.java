@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.fixed.monitor.R;
 import com.fixed.monitor.base.BaseFragment;
+import com.fixed.monitor.base.CrashExpection;
 import com.fixed.monitor.base.adapter.MCommAdapter;
 import com.fixed.monitor.base.adapter.MCommVH;
 import com.fixed.monitor.bean.LogBean;
@@ -22,6 +23,12 @@ import com.fixed.monitor.model.popup.PopupSetVideoTimeView;
 import com.fixed.monitor.model.setting.SettingAct;
 import com.fixed.monitor.util.VideoPathUtil;
 import com.zlylib.fileselectorlib.FileSelector;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 public class SettingFragment extends BaseFragment {
 
@@ -107,8 +114,8 @@ public class SettingFragment extends BaseFragment {
                             setPsw_rl.setVisibility(View.VISIBLE);
                             break;
                         case R.id.setting_ll4://系统日志
-//                            loglist_rcv.setVisibility(View.VISIBLE);
-                            startActivity(new Intent(getContext(), LogListAct.class));
+                            loglist_rcv.setVisibility(View.VISIBLE);
+//                            startActivity(new Intent(getContext(), LogListAct.class));
                             break;
                     }
                 }
@@ -126,13 +133,14 @@ public class SettingFragment extends BaseFragment {
         setDuringTime_rl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                popupInputPswView.showCenter(view);
+                popupSetVideoTimeView.showCenter(view);
+
             }
         });
         setPsw_rl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                popupSetVideoTimeView.showCenter(view);
+                popupInputPswView.showCenter(view);
             }
         });
         views[0].performClick();
@@ -150,7 +158,47 @@ public class SettingFragment extends BaseFragment {
 
     @Override
     public void doBusiness() {
+        getLogData();
+    }
 
+
+    public List<LogBean> getLogData() {
+        List<LogBean> logBeans  = new ArrayList<>();
+        String folderPath = CrashExpection.getInstance(getContext()).getPath();
+        File f = new File(folderPath);
+        if (!f.exists()) {//判断路径是否存在
+            return logBeans;
+        }
+        File[] files = f.listFiles();
+        if (files == null) {//判断权限
+            return logBeans;
+        }
+        for (File _file : files) {//遍历目录
+            if (_file.isFile() && _file.getName().endsWith("txt")) {
+                String _name = _file.getName();
+                String filePath = _file.getAbsolutePath();//获取文件路径
+//                String fileName = _file.getName().substring(0, _name.length() - 4);//获取文件名
+                String fileName = _file.getName();//获取文件名
+                String createTime = getFileLastModifiedTime(_file);
+
+                LogBean logBean = new LogBean();
+                logBean.name = _name;
+                logBean.path = filePath;
+                logBean.createTime = createTime;
+                logBeans.add(logBean);
+            }
+        }
+        return  logBeans;
+    }
+
+    private static final String mformatType = "yyyy/MM/dd HH:mm:ss";
+    public static String getFileLastModifiedTime(File file) {
+        Calendar cal = Calendar.getInstance();
+        long time = file.lastModified();
+        SimpleDateFormat formatter = new SimpleDateFormat(mformatType);
+        cal.setTimeInMillis(time);
+        // 输出：修改时间[2] 2009-08-17 10:32:38
+        return formatter.format(cal.getTime());
     }
 
     @Override
