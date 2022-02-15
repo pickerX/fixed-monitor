@@ -20,5 +20,9 @@ public class VideoRecordBean extends BaseBean {
     @DatabaseField(defaultValue = "")
     public String videoCachePath;//视频缓存路径
     @DatabaseField(dataType = DataType.LONG)
-    public long videoCreateTime= 0 ;//视频创建时间
+    public long videoRecordStartTime= 0 ;//视频录制开始时间
+    @DatabaseField(dataType = DataType.LONG)
+    public long videoRecordEndTime= 0 ;//视频录制结束时间
+    @DatabaseField(dataType = DataType.LONG)
+    public long videoCreateTime= 0 ;//视频保存时间
 }

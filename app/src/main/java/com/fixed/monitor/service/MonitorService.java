@@ -179,6 +179,9 @@ public class MonitorService extends Service {
                     videoRecordBean.videoSize = size;
                     videoRecordBean.videoCover = coverPath;
                     videoRecordBean.videoDuringTime = duringTime;
+                    videoRecordBean.videoCreateTime = System.currentTimeMillis();
+                    videoRecordBean.videoRecordStartTime = stopMillis - duringTime;
+                    videoRecordBean.videoRecordEndTime = stopMillis;
                     dao.insert(videoRecordBean);
                 } catch (Exception e) {
                     e.printStackTrace();

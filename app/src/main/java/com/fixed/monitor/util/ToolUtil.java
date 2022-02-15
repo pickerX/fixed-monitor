@@ -7,6 +7,9 @@ import android.content.Intent;
 
 import com.fixed.monitor.model.App;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class ToolUtil {
 
     public static int string2Int(String s) {
@@ -74,6 +77,20 @@ public class ToolUtil {
             return hours + "小时" + minutes + "分" + second + "秒";
         }
     }
+
+
+    public static String timestamp2String(long timestamp, String format) {
+        String sd = "";
+        format = (isNull(format) ? "yyyy-MM-dd HH:mm:ss" : format);
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat(format);
+            sd = sdf.format(new Date(timestamp));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return sd;
+    }
+
 
     /**
      * @param

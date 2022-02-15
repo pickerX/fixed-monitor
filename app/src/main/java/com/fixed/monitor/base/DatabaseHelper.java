@@ -15,7 +15,7 @@ import java.util.Map;
 
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
-	private static final int db_version = 6;
+	private static final int db_version = 7;
 	private static final String TABLE_NAME = "fixedmonitor-sqlite.db";
 	private Map<String, Dao> daos = new HashMap<String, Dao>();
 

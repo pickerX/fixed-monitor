@@ -84,7 +84,8 @@ public class MainActivity extends AppCompatActivity {
                                 navHostController.navigate(R.id.camera_fragment);
                                 break;
                             case R.id.tab2_ll:
-                                startActivity(new Intent(MainActivity.this, VideoListAct.class));
+                                navHostController.navigate(R.id.videolist_fragment);
+//                                startActivity(new Intent(MainActivity.this, VideoListAct.class));
                                 break;
                             case R.id.tab3_ll:
                                 navHostController.navigate(R.id.setting_fragment);
@@ -155,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(monitorService!=null){
+        if (monitorService != null) {
             unbindService(coreServiceConnection);
         }
     }

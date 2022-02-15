@@ -57,6 +57,13 @@
     </fragment>
 
     <fragment
+        android:id="@+id/videolist_fragment"
+        android:name="com.fixed.monitor.fragment.VideoListFragment"
+        tools:layout="Setting"
+        >
+    </fragment>
+
+    <fragment
         android:id="@+id/setting_fragment"
         android:name="com.fixed.monitor.fragment.SettingFragment"
         tools:layout="Setting"
