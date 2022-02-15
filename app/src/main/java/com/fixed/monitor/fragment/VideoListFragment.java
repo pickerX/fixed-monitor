@@ -1,5 +1,6 @@
 package com.fixed.monitor.fragment;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 import android.view.View;
@@ -24,6 +25,10 @@ import com.scwang.smart.refresh.layout.SmartRefreshLayout;
 import com.scwang.smart.refresh.layout.api.RefreshLayout;
 import com.scwang.smart.refresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smart.refresh.layout.listener.OnRefreshListener;
+import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
+
+import java.util.Calendar;
+import java.util.Date;
 
 public class VideoListFragment extends BaseFragment {
 
@@ -34,6 +39,9 @@ public class VideoListFragment extends BaseFragment {
 
     private int pageSize = 10;
     private IVideoRecordDao dao;
+
+    private View selectDateView;
+    private DatePickerDialog datePickerDialog;
 
     @Override
     public int setLayoutID() {
@@ -77,6 +85,27 @@ public class VideoListFragment extends BaseFragment {
         });
         commAdapter.setShowEmptyView(true);
         rcv.setAdapter(commAdapter);
+
+        selectDateView = view.findViewById(R.id.seledate_ll);
+        selectDateView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Calendar now = Calendar.getInstance();
+                DatePickerDialog dpd = DatePickerDialog.newInstance(
+                        new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
+
+                            }
+                        },
+                        now.get(Calendar.YEAR), // Initial year selection
+                        now.get(Calendar.MONTH), // Initial month selection
+                        now.get(Calendar.DAY_OF_MONTH) // Inital day selection
+                );
+// If you're calling this from a support Fragment
+                dpd.show(getFragmentManager(), "Datepickerdialog");
+            }
+        });
     }
 
     @Override

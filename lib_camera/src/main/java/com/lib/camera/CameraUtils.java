@@ -31,19 +31,19 @@ public class CameraUtils {
     }
 
     public static File createFile(Context context, String dir, String extension) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss", Locale.US);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS", Locale.US);
         String date = sdf.format(new Date());
         if (dir.equals(Monitor.DEFAULT_SAVE_DIR)) {
             File parent = getDefaultDir(context, dir);
             if (!parent.exists()) parent.mkdirs();
 
-            return new File(parent, String.format("vod_%s.%s", date, extension));
+            return new File(parent, String.format("VID_%s.%s", date, extension));
         } else {
             File parent = new File(dir);
             if (!parent.exists()) parent.mkdirs();
 
             // 指定目录时
-            return new File(dir, String.format("vod_%s.%s", date, extension));
+            return new File(dir, String.format("VID_%s.%s", date, extension));
         }
     }
 

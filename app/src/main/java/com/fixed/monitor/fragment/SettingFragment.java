@@ -140,7 +140,7 @@ public class SettingFragment extends BaseFragment {
         setPsw_rl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                popupSetVideoTimeView.showCenter(view);
+                popupInputPswView.showCenter(view);
             }
         });
         views[0].performClick();
