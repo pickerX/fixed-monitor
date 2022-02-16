@@ -43,6 +43,7 @@
 
         <activity
             android:name=".model.video.VideoPlayerAct"
+            android:screenOrientation="landscape"
             android:configChanges="orientation|screenSize|keyboardHidden" />
         <activity android:name=".model.video.VideoListAct" />
         <activity android:name=".model.setting.SettingAct" />

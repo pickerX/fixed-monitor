@@ -2,6 +2,7 @@ package com.fixed.monitor.model.dbdao.impl;
 
 import android.content.Context;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import com.fixed.monitor.base.DatabaseHelper;
 import com.fixed.monitor.bean.VideoRecordBean;
@@ -9,6 +10,7 @@ import com.fixed.monitor.model.App;
 import com.fixed.monitor.model.dbdao.IVideoRecordDao;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.stmt.Where;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -68,7 +70,7 @@ public class VideoRecordDaoImpl implements IVideoRecordDao {
             try {
                 QueryBuilder<VideoRecordBean, Integer> q = fOpe.queryBuilder();
 
-                q.where().eq("",id);
+                q.where().eq("", id);
 
 
             } catch (SQLException e) {
@@ -93,20 +95,22 @@ public class VideoRecordDaoImpl implements IVideoRecordDao {
     }
 
     @Override
-    public List<VideoRecordBean> queryByDate_Page(int offset, int pageSize, long startTime,long endTime) {
+    public List<VideoRecordBean> queryByDate_Page(int offset, int pageSize, long startTime, long endTime) {
         List<VideoRecordBean> videoRecordBeans = new ArrayList<>();
         if (fOpe != null) {
             try {
 //                long startRow = (long)startID;
                 QueryBuilder<VideoRecordBean, Integer> q = fOpe.queryBuilder();
+                Where<VideoRecordBean,Integer> where =  q.where().raw("1=1");
                 if (startTime != 0) {
-                    q.where().ge("videoCreateTime", startTime);
+                    where.and().ge("videoCreateTime", startTime);
                 }
                 if (endTime != 0) {
-                    q.where().le("videoCreateTime", endTime);
+                    where.and().le("videoCreateTime", endTime);
                 }
-                q.offset((long)offset).limit((long) pageSize);
+                q.offset((long) offset).limit((long) pageSize);
                 q.orderBy("_id", false);
+                Log.i("jjjjjjjjaack", q.prepareStatementString());
                 videoRecordBeans = q.query();
             } catch (SQLException e) {
             }

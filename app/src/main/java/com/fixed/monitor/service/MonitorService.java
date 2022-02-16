@@ -14,8 +14,10 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.text.TextUtils;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -54,6 +56,7 @@ public class MonitorService extends Service {
     private Monitor monitor;
 
     private boolean isRecording;
+    private boolean isbind;
     private long recordDuringTime;
     private long startMillis;
     private IVideoRecordDao dao;
@@ -64,8 +67,8 @@ public class MonitorService extends Service {
     private int smallWidth, smallHeight;
     private View windowMainView;
     private AutoFitSurfaceView mAutoFitSurfaceView;
-    private View record_tv, record_view;
-    private TextView state_tv;
+    private View record_view;
+    private TextView record_tv,state_tv;
 
     private static final Intent SERVICE_INTENT = new Intent();
 
@@ -148,8 +151,8 @@ public class MonitorService extends Service {
                 .setDirectory(VideoPathUtil.getPath(this))
                 .setCameraOrientation(Monitor.FACING_FRONT)
                 .setTarget(mAutoFitSurfaceView)
-//                .setDuration(VideoPathUtil.getVideoRecordTime(this))
-                .setDuration(1) //1分钟录制时长，测试用
+                .setDuration(VideoPathUtil.getVideoRecordTime(this))
+//                .setDuration(1) //1分钟录制时长，测试用
                 .setDirectory(directory)
                 .setPreview(true)
                 .setLoop(true)
@@ -222,7 +225,7 @@ public class MonitorService extends Service {
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT);
         //初始化位置
-        mWindowManagerParams.gravity = Gravity.BOTTOM | Gravity.RIGHT;
+//        mWindowManagerParams.gravity = Gravity.BOTTOM | Gravity.RIGHT;
         mWindowManagerParams.x = 10;
         mWindowManagerParams.y = 100;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -233,8 +236,50 @@ public class MonitorService extends Service {
         mAutoFitSurfaceView.setMaxSize(smallWidth, smallHeight);
         //获取WindowManager对象
         mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+        record_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP,12);
+        state_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP,12);
         mWindowManager.addView(windowMainView, mWindowManagerParams);
 
+        windowMainView.setOnTouchListener(new View.OnTouchListener() {
+            // 触屏监听
+            float lastX, lastY;
+            int oldOffsetX, oldOffsetY;
+            int tag = 0;// 悬浮球 所需成员变量
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(isbind){
+                    return false ;
+                }
+                final int action = event.getAction();
+                float x = event.getX();
+                float y = event.getY();
+                if (tag == 0) {
+                    oldOffsetX = mWindowManagerParams.x; // 偏移量
+                    oldOffsetY = mWindowManagerParams.y; // 偏移量
+                }
+                if (action == MotionEvent.ACTION_DOWN) {
+                    lastX = x;
+                    lastY = y;
+                } else if (action == MotionEvent.ACTION_MOVE) {
+                    mWindowManagerParams.x += (int) (x - lastX) / 3; // 减小偏移量,防止过度抖动
+                    mWindowManagerParams.y += (int) (y - lastY) / 3; // 减小偏移量,防止过度抖动
+                    tag = 1;
+                    mWindowManager.updateViewLayout(windowMainView, mWindowManagerParams);
+                } else if (action == MotionEvent.ACTION_UP) {
+                    int newOffsetX = mWindowManagerParams.x;
+                    int newOffsetY = mWindowManagerParams.y;
+                    // 只要按钮一动位置不是很大,就认为是点击事件
+                    if (Math.abs(oldOffsetX - newOffsetX) <= 20
+                            && Math.abs(oldOffsetY - newOffsetY) <= 20) {
+//                        onFloatViewClick(l);
+                    } else {
+                        tag = 0;
+                    }
+                }
+                return true;
+            }
+        });
     }
 
     public void startCountDown() {
@@ -270,6 +315,7 @@ public class MonitorService extends Service {
 
 
     public void bindMonitorView(View parentView) {
+        isbind = true;
         parentView.post(new Runnable() {
             @Override
             public void run() {
@@ -278,9 +324,11 @@ public class MonitorService extends Service {
                 parentView.getLocationOnScreen(points);
                 mWindowManagerParams.x = points[0];
                 mWindowManagerParams.y = points[1];
-                mWindowManagerParams.gravity = Gravity.TOP | Gravity.LEFT;
+//                mWindowManagerParams.gravity = Gravity.TOP | Gravity.LEFT;
                 mWindowManagerParams.width = parentView.getWidth();
                 mWindowManagerParams.height = parentView.getHeight();
+                record_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP,24);
+                state_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP,24);
                 mAutoFitSurfaceView.setMaxSize(MeasureUtil.getScreenWidth(MonitorService.this), MeasureUtil.getScreenHeight(MonitorService.this));
                 mWindowManager.updateViewLayout(windowMainView, mWindowManagerParams);
             }
@@ -291,11 +339,15 @@ public class MonitorService extends Service {
     public void unBindMonitorView(ViewGroup viewfl) {
         mWindowManagerParams.x = MeasureUtil.dip2px(this,98);
         mWindowManagerParams.y = 100;
-        mWindowManagerParams.gravity = Gravity.BOTTOM | Gravity.LEFT;
+//        mWindowManagerParams.gravity = Gravity.BOTTOM | Gravity.LEFT;
         mWindowManagerParams.width = smallWidth;
         mWindowManagerParams.height = smallHeight;
         mAutoFitSurfaceView.setMaxSize(smallWidth, smallHeight);
+        record_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP,12);
+        state_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP,12);
         mWindowManager.updateViewLayout(windowMainView, mWindowManagerParams);
+
+        isbind = false;
     }
 
     public void refreshRecordUI() {

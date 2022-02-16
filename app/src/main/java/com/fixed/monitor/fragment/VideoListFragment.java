@@ -2,9 +2,12 @@ package com.fixed.monitor.fragment;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -17,16 +20,21 @@ import com.fixed.monitor.base.adapter.MCommVH;
 import com.fixed.monitor.bean.VideoRecordBean;
 import com.fixed.monitor.model.dbdao.IVideoRecordDao;
 import com.fixed.monitor.model.dbdao.impl.VideoRecordDaoImpl;
+import com.fixed.monitor.model.popup.PopupInputPswView;
 import com.fixed.monitor.model.video.VideoListAct;
 import com.fixed.monitor.model.video.VideoPlayerAct;
 import com.fixed.monitor.util.GlideUtil;
+import com.fixed.monitor.util.T;
 import com.fixed.monitor.util.ToolUtil;
+import com.fixed.monitor.view.MyDatePickerDialog;
 import com.scwang.smart.refresh.layout.SmartRefreshLayout;
 import com.scwang.smart.refresh.layout.api.RefreshLayout;
 import com.scwang.smart.refresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smart.refresh.layout.listener.OnRefreshListener;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -35,6 +43,7 @@ public class VideoListFragment extends BaseFragment {
 
     private SmartRefreshLayout refreshLayout;
     private RecyclerView rcv;
+    private TextView searchDate_tv;
     private MCommAdapter<VideoRecordBean> commAdapter;
 
     private int pageSize = 10;
@@ -43,6 +52,8 @@ public class VideoListFragment extends BaseFragment {
     private View selectDateView;
     private DatePickerDialog datePickerDialog;
 
+    private long startTime, endTime;
+
     @Override
     public int setLayoutID() {
         return R.layout.fragment_videolist;
@@ -50,6 +61,7 @@ public class VideoListFragment extends BaseFragment {
 
     @Override
     public void initView(View view) {
+        searchDate_tv = view.findViewById(R.id.searchDate_tv);
         refreshLayout = view.findViewById(R.id.refreshLayout);
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
@@ -91,11 +103,26 @@ public class VideoListFragment extends BaseFragment {
             @Override
             public void onClick(View view) {
                 Calendar now = Calendar.getInstance();
-                DatePickerDialog dpd = DatePickerDialog.newInstance(
+                MyDatePickerDialog dpd = MyDatePickerDialog.newInstance(
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
-
+//                                Log.i("jjjjjjjjaack",year+"_"+monthOfYear+"_"+dayOfMonth);
+                                try {
+                                    monthOfYear++;
+                                    searchDate_tv.setText(year + "年" + monthOfYear + "月" + dayOfMonth + "日");
+                                    String dateStr = year + "-" + monthOfYear + "-" + dayOfMonth;
+                                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                                    Date date = null;
+                                    date = simpleDateFormat.parse(dateStr);
+                                    long starts = date.getTime();
+                                    long ends = starts + 24 * 60 * 60 * 1000;
+                                    startTime = starts;
+                                    endTime = ends;
+                                    getData(true);
+                                } catch (Exception e) {
+                                    T.showShort(getContext(), "选择时间失败");
+                                }
                             }
                         },
                         now.get(Calendar.YEAR), // Initial year selection
@@ -104,14 +131,30 @@ public class VideoListFragment extends BaseFragment {
                 );
 // If you're calling this from a support Fragment
                 dpd.show(getFragmentManager(), "Datepickerdialog");
+                dpd.setMyDatePickerDialogInterface(new MyDatePickerDialog.MyDatePickerDialogInterface() {
+                    @Override
+                    public void doCancleClick() {
+//                        Log.i("jjjjjjjjaack","1212");
+                        searchDate_tv.setText("日期筛选");
+                        startTime = 0;
+                        endTime = 0;
+                        getData(true);
+                    }
+                });
             }
         });
     }
 
     @Override
     public void doBusiness() {
-        dao = new VideoRecordDaoImpl(getContext());
-        refreshLayout.autoRefresh();
+        PopupInputPswView popupInputPswView = new PopupInputPswView(getContext(), new PopupInputPswView.PopupInputPswViewInterface() {
+            @Override
+            public void success() {
+                dao = new VideoRecordDaoImpl(getContext());
+                refreshLayout.autoRefresh();
+            }
+        });
+        popupInputPswView.showCenter(refreshLayout);
     }
 
     /**
@@ -123,10 +166,10 @@ public class VideoListFragment extends BaseFragment {
      */
     public void getData(boolean isRefresh) {
         if (isRefresh) {
-            commAdapter.setData(dao.queryByDate_Page(0, pageSize, 0, 0));
+            commAdapter.setData(dao.queryByDate_Page(0, pageSize, startTime, endTime));
         } else {
             int offset = commAdapter.getSize();
-            commAdapter.addData(dao.queryByDate_Page(offset, pageSize, 0, 0));
+            commAdapter.addData(dao.queryByDate_Page(offset, pageSize, startTime, endTime));
         }
         new Handler().postDelayed(new Runnable() {
             @Override

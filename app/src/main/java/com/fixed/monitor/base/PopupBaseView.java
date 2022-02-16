@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
+import android.os.Handler;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -15,6 +16,7 @@ import android.widget.PopupWindow;
 
 import com.fixed.monitor.R;
 import com.fixed.monitor.util.MeasureUtil;
+import com.fixed.monitor.util.ToolUtil;
 
 public abstract class PopupBaseView {
     public int frameWidth, frameHeight;
@@ -179,7 +181,16 @@ public abstract class PopupBaseView {
     }
 
     public void onPopupDismiss(){
-
+//        try {
+//            new Handler().postDelayed(new Runnable() {
+//                @Override
+//                public void run() {
+//                    ToolUtil.closeKeybord((Activity) context);
+//                }
+//            },300);
+//        }catch (Exception e){
+//
+//        }
     }
 
     public boolean isShow() {

@@ -37,13 +37,13 @@ public class CameraUtils {
             File parent = getDefaultDir(context, dir);
             if (!parent.exists()) parent.mkdirs();
 
-            return new File(parent, String.format("VID_%s.%s", date, extension));
+            return new File(parent, String.format("VOD_%s.%s", date, extension));
         } else {
             File parent = new File(dir);
             if (!parent.exists()) parent.mkdirs();
 
             // 指定目录时
-            return new File(dir, String.format("VID_%s.%s", date, extension));
+            return new File(dir, String.format("VOD_%s.%s", date, extension));
         }
     }
 

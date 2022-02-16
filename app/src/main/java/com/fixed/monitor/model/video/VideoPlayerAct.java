@@ -103,8 +103,8 @@ public class VideoPlayerAct extends BaseAct {
 
     @Override
     public void onBackPressed() {
-        if (videoView != null && !videoView.onBackPressed()) {
+//        if (videoView != null && !videoView.onBackPressed()) {
             super.onBackPressed();
-        }
+//        }
     }
 }

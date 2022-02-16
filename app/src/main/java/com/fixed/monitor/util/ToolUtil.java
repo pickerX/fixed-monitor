@@ -1,9 +1,11 @@
 package com.fixed.monitor.util;
 
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.view.inputmethod.InputMethodManager;
 
 import com.fixed.monitor.model.App;
 
@@ -106,5 +108,16 @@ public class ToolUtil {
         AlarmManager mgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000, restartIntent);
         android.os.Process.killProcess(android.os.Process.myPid());
+    }
+
+    /**
+     * 自动关闭软键盘
+     * @param activity
+     */
+    public static void closeKeybord(Activity activity) {
+        InputMethodManager imm =  (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if(imm != null) {
+            imm.hideSoftInputFromWindow(activity.getWindow().getDecorView().getWindowToken(), 0);
+        }
     }
 }

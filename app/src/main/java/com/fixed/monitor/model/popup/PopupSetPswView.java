@@ -36,8 +36,8 @@ public class PopupSetPswView extends PopupBaseView {
         this.popupWindow =
                 new PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT);
-        this.popupWindow.setSoftInputMode(PopupWindow.INPUT_METHOD_NEEDED);
-        this.popupWindow.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+//        this.popupWindow.setSoftInputMode(PopupWindow.INPUT_METHOD_NEEDED);
+//        this.popupWindow.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
     }
 
     @Override

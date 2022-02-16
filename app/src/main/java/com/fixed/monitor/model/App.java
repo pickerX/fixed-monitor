@@ -4,6 +4,8 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 
+import com.facebook.stetho.Stetho;
+import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.fixed.monitor.base.CrashExpection;
 import com.fixed.monitor.base.DatabaseHelper;
 import com.fixed.monitor.service.MonitorService;
@@ -19,6 +21,7 @@ import com.scwang.smart.refresh.layout.listener.DefaultRefreshHeaderCreator;
 
 import java.io.File;
 
+import okhttp3.OkHttpClient;
 import xyz.doikki.videoplayer.player.AndroidMediaPlayerFactory;
 import xyz.doikki.videoplayer.player.VideoViewConfig;
 import xyz.doikki.videoplayer.player.VideoViewManager;
@@ -56,6 +59,11 @@ public class App extends Application {
         initSmartRefreshLayout();
         initVideoRecordParameter();
         initDataService();
+
+        Stetho.initializeWithDefaults(this);
+        new OkHttpClient.Builder()
+                .addNetworkInterceptor(new StethoInterceptor())
+                .build();
     }
 
     /**

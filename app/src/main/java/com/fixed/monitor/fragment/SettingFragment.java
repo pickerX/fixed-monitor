@@ -22,12 +22,15 @@ import com.fixed.monitor.model.popup.PopupSetPswView;
 import com.fixed.monitor.model.popup.PopupSetVideoTimeView;
 import com.fixed.monitor.model.setting.SettingAct;
 import com.fixed.monitor.util.VideoPathUtil;
+import com.google.android.exoplayer2.C;
 import com.zlylib.fileselectorlib.FileSelector;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class SettingFragment extends BaseFragment {
@@ -89,6 +92,7 @@ public class SettingFragment extends BaseFragment {
                 mCommVH.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        LogDetailAct.openAct(getContext(),o.name,o.path);
                     }
                 });
             }
@@ -158,7 +162,14 @@ public class SettingFragment extends BaseFragment {
 
     @Override
     public void doBusiness() {
-        getLogData();
+       logAdapter.setData(getLogData());
+       PopupInputPswView popupInputPswView = new PopupInputPswView(getContext(), new PopupInputPswView.PopupInputPswViewInterface() {
+           @Override
+           public void success() {
+
+           }
+       });
+       popupInputPswView.showCenter(setPsw_rl);
     }
 
 
@@ -188,6 +199,13 @@ public class SettingFragment extends BaseFragment {
                 logBeans.add(logBean);
             }
         }
+
+        Collections.sort(logBeans, new Comparator<LogBean>() {
+            @Override
+            public int compare(LogBean logBean, LogBean t1) {
+                return t1.createTime.compareTo(logBean.createTime);
+            }
+        });
         return  logBeans;
     }
 

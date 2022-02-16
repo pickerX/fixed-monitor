@@ -90,22 +90,22 @@ public class MCommAdapter<B extends Object> extends MBaseAdapter<MCommVH> {
      * @author jiejack
      * @time 2022/2/4 9:36 下午
      */
-    public int getSize(){
+    public int getSize() {
         return beanList.size();
     }
 
     @Override
     public MCommVH onCreateViewHolder(ViewGroup parent, int viewType) {
-        if(isEmpty){
+        if (viewType==-1) {
             return new MCommVH(mLayoutInflater.inflate(R.layout.view_listdata_empty,
-                    parent,false), mContext, mCommVHInterface);
+                    parent, false), mContext, mCommVHInterface);
         }
         return new MCommVH(mLayoutInflater.inflate(mCommVHInterface.setLayout(), parent, false), mContext, mCommVHInterface);
     }
 
     @Override
     public void onBindViewHolder(@NonNull MCommVH holder, int position) {
-        if(!isEmpty) {
+        if (!isEmpty) {
             holder.bindData(position, beanList.get(position));
         }
     }
@@ -113,7 +113,7 @@ public class MCommAdapter<B extends Object> extends MBaseAdapter<MCommVH> {
 
     @Override
     public int getItemViewType(int position) {
-        return super.getItemViewType(position);
+        return isEmpty ? -1 : super.getItemViewType(position);
     }
 
     /**
@@ -123,7 +123,7 @@ public class MCommAdapter<B extends Object> extends MBaseAdapter<MCommVH> {
      * @author jiejack
      * @time 2022/2/3 12:31 上午
      */
-    public void setShowEmptyView(boolean showEmptyView){
+    public void setShowEmptyView(boolean showEmptyView) {
         this.showEmptyView = showEmptyView;
     }
 
