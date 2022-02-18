@@ -11,7 +11,6 @@ import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Binder;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.TypedValue;
@@ -21,7 +20,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -30,7 +28,6 @@ import com.fixed.monitor.R;
 import com.fixed.monitor.bean.VideoRecordBean;
 import com.fixed.monitor.model.dbdao.IVideoRecordDao;
 import com.fixed.monitor.model.dbdao.impl.VideoRecordDaoImpl;
-import com.fixed.monitor.util.CEvent;
 import com.fixed.monitor.util.MeasureUtil;
 import com.fixed.monitor.util.ToolUtil;
 import com.fixed.monitor.util.VideoPathUtil;
@@ -41,8 +38,6 @@ import com.lib.record.Config;
 import com.lib.record.ConfigBuilder;
 import com.lib.record.Monitor;
 import com.lib.record.MonitorFactory;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -238,7 +233,11 @@ public class MonitorService extends Service {
         mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         record_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP,12);
         state_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP,12);
-        mWindowManager.addView(windowMainView, mWindowManagerParams);
+        try {
+            mWindowManager.addView(windowMainView, mWindowManagerParams);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         windowMainView.setOnTouchListener(new View.OnTouchListener() {
             // 触屏监听
@@ -337,7 +336,7 @@ public class MonitorService extends Service {
 
 
     public void unBindMonitorView(ViewGroup viewfl) {
-        mWindowManagerParams.x = MeasureUtil.dip2px(this,98);
+        mWindowManagerParams.x = MeasureUtil.dip2px(this, 98);
         mWindowManagerParams.y = 100;
 //        mWindowManagerParams.gravity = Gravity.BOTTOM | Gravity.LEFT;
         mWindowManagerParams.width = smallWidth;
@@ -353,7 +352,6 @@ public class MonitorService extends Service {
     public void refreshRecordUI() {
 
     }
-
 
 
     @Override

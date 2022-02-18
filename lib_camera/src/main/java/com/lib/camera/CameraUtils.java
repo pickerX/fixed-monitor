@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Point;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Size;
@@ -14,6 +15,7 @@ import com.lib.record.Monitor;
 import com.lib.util.StorageUtil;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -27,6 +29,11 @@ import java.util.Locale;
 public class CameraUtils {
 
     public static File getDefaultDir(Context context, String dir) {
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            File root = Environment.getExternalStorageDirectory();
+            return new File(root.getAbsolutePath() + File.separator + dir);
+        }
+
         return context.getExternalFilesDir(dir);
     }
 

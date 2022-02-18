@@ -1,30 +1,28 @@
 package com.fixed.monitor;
 
+import static androidx.navigation.Navigation.findNavController;
+
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentContainerView;
 import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 
-import com.fixed.monitor.model.popup.PopupInputPswView;
-import com.fixed.monitor.model.setting.SettingAct;
-import com.fixed.monitor.model.video.VideoListAct;
 import com.fixed.monitor.service.MonitorService;
-import com.fixed.monitor.util.PasswordUtil;
-import com.fixed.monitor.util.T;
-import com.fixed.monitor.view.MsCodeInputView;
+import com.fixed.monitor.util.ToolUtil;
+import com.fixed.monitor.util.VideoPathUtil;
+import com.zlylib.fileselectorlib.utils.Const;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -78,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
                     reSetTabView();
                     view.setSelected(true);
                     try {
-                        NavController navHostController = Navigation.findNavController(MainActivity.this, R.id.fragment_container);
+                        NavController navHostController = findNavController(MainActivity.this, R.id.fragment_container);
                         switch (view.getId()) {
                             case R.id.tab1_ll:
                                 navHostController.navigate(R.id.camera_fragment);
@@ -153,6 +151,21 @@ public class MainActivity extends AppCompatActivity {
                         View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY));
 
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && data != null) {
+            ArrayList<String> list = data.getStringArrayListExtra(Const.EXTRA_RESULT_SELECTION);
+            if (list.isEmpty()) {
+                return;
+            }
+            String dir = list.get(0);
+            VideoPathUtil.savePath(this, dir);
+
+            mFragment.postDelayed(() -> ToolUtil.reStartApp(this), 1200L);
+        }
     }
 
     @Override

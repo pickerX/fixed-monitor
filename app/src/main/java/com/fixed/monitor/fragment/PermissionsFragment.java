@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
@@ -15,6 +16,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
@@ -36,18 +38,22 @@ public class PermissionsFragment extends Fragment {
             Manifest.permission.CAMERA,
             Manifest.permission.RECORD_AUDIO,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.READ_EXTERNAL_STORAGE
+            Manifest.permission.READ_EXTERNAL_STORAGE,
     };
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // request auto launch when boot
-//        if (!hasAutoLaunchPermission()) {
-//            Intent intent = getAutostartSettingIntent(requireContext());
-//            startActivity(intent);
-//            return;
-//        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                && !Settings.canDrawOverlays(getContext())) {
+            requestOverlay(this::requestCamera);
+        } else {
+            requestCamera();
+        }
+    }
+
+    private void requestCamera() {
         // Request camera-related permissions
         ActivityResultContracts.RequestMultiplePermissions contract =
                 new ActivityResultContracts.RequestMultiplePermissions();
@@ -55,6 +61,7 @@ public class PermissionsFragment extends Fragment {
         ActivityResultLauncher<String[]> session = registerForActivityResult(contract, result -> {
             boolean grantResults = true;
             Set<String> keys = result.keySet();
+
             for (String key : keys) {
                 if (result.get(key) != null && !result.get(key)) {
                     grantResults = false;
@@ -62,16 +69,7 @@ public class PermissionsFragment extends Fragment {
                 Log.d("Permission", key + " > " + result.get(key));
             }
             if (grantResults) {
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M&&!Settings.canDrawOverlays(getContext())) {
-//没有权限，需要申请权限，因为是打开一个授权页面，所以拿不到返回状态的，所以建议是在onResume方法中从新执行一次校验
-                    Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
-                    intent.setData(Uri.parse("package:" + getContext().getPackageName()));
-                    startActivityForResult(intent, 100);
-                }else{
-                    Navigation.findNavController(requireActivity(), R.id.fragment_container).navigate(
-                            PermissionsFragmentDirections.actionPermissionsToXcamera());
-                }
+                navigate();
             } else {
                 Toast.makeText(requireContext(),
                         "Permission request denied", Toast.LENGTH_LONG)
@@ -79,6 +77,47 @@ public class PermissionsFragment extends Fragment {
             }
         });
         session.launch(PERMISSIONS_REQUIRED);
+    }
+
+    private void navigate() {
+        Navigation.findNavController(requireActivity(), R.id.fragment_container).navigate(
+                PermissionsFragmentDirections.actionPermissionsToXcamera());
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void requestOverlay(Runnable next) {
+        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+        intent.setData(Uri.parse("package:" + requireContext().getPackageName()));
+
+        ActivityResultContracts.StartActivityForResult contract =
+                new ActivityResultContracts.StartActivityForResult();
+        ActivityResultLauncher<Intent> session = registerForActivityResult(contract, result -> {
+            if (Settings.canDrawOverlays(getContext())) {
+                next.run();
+            }
+        });
+        session.launch(intent);
+    }
+
+    private void requestExternalStorage() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            if (Environment.isExternalStorageManager()) {
+                // API 30 获取全部存储权限
+                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                intent.setData(Uri.parse("package:" + requireContext().getPackageName()));
+
+                ActivityResultContracts.StartActivityForResult contract =
+                        new ActivityResultContracts.StartActivityForResult();
+                ActivityResultLauncher<Intent> session = registerForActivityResult(contract, result -> {
+                    if (Environment.isExternalStorageManager()) {
+                        Log.d("Permission", "获取全部文件权限");
+                    } else {
+                        Log.e("Permission", "获取全部文件权限失败");
+                    }
+                });
+                session.launch(intent);
+            }
+        }
     }
 
     public boolean hasAutoLaunchPermission() {

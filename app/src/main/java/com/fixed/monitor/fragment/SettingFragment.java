@@ -1,7 +1,7 @@
 package com.fixed.monitor.fragment;
 
 import android.content.Context;
-import android.content.Intent;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
@@ -16,13 +16,10 @@ import com.fixed.monitor.base.adapter.MCommAdapter;
 import com.fixed.monitor.base.adapter.MCommVH;
 import com.fixed.monitor.bean.LogBean;
 import com.fixed.monitor.model.log.LogDetailAct;
-import com.fixed.monitor.model.log.LogListAct;
 import com.fixed.monitor.model.popup.PopupInputPswView;
 import com.fixed.monitor.model.popup.PopupSetPswView;
 import com.fixed.monitor.model.popup.PopupSetVideoTimeView;
-import com.fixed.monitor.model.setting.SettingAct;
 import com.fixed.monitor.util.VideoPathUtil;
-import com.google.android.exoplayer2.C;
 import com.zlylib.fileselectorlib.FileSelector;
 
 import java.io.File;
@@ -40,6 +37,7 @@ public class SettingFragment extends BaseFragment {
     View setpath_fl, setDuringTime_rl, setPsw_rl;
 
     TextView savetime_tv;
+    TextView dir_tv;
 
     RecyclerView loglist_rcv;
     MCommAdapter logAdapter;
@@ -61,6 +59,7 @@ public class SettingFragment extends BaseFragment {
         views[3] = view.findViewById(R.id.setting_ll4);
 
         setpath_fl = view.findViewById(R.id.setpath_fl);
+        dir_tv = view.findViewById(R.id.tv_dir);
         setDuringTime_rl = view.findViewById(R.id.setDuringTime_rl);
         setPsw_rl = view.findViewById(R.id.setPsw_rl);
 
@@ -92,7 +91,7 @@ public class SettingFragment extends BaseFragment {
                 mCommVH.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        LogDetailAct.openAct(getContext(),o.name,o.path);
+                        LogDetailAct.openAct(getContext(), o.name, o.path);
                     }
                 });
             }
@@ -162,19 +161,33 @@ public class SettingFragment extends BaseFragment {
 
     @Override
     public void doBusiness() {
-       logAdapter.setData(getLogData());
-       PopupInputPswView popupInputPswView = new PopupInputPswView(getContext(), new PopupInputPswView.PopupInputPswViewInterface() {
-           @Override
-           public void success() {
+        logAdapter.setData(getLogData());
+        PopupInputPswView popupInputPswView = new PopupInputPswView(getContext(), new PopupInputPswView.PopupInputPswViewInterface() {
+            @Override
+            public void success() {
 
-           }
-       });
-       popupInputPswView.showCenter(setPsw_rl);
+            }
+        });
+        popupInputPswView.showCenter(setPsw_rl);
     }
 
+    private void updateSaveDir() {
+        String dir = VideoPathUtil.getPath(requireContext());
+        if (TextUtils.isEmpty(dir)) return;
+
+        dir = dir.replace("/storage/emulated/0", "/sdcard");
+        dir_tv.setText(dir);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        dir_tv.postDelayed(this::updateSaveDir, 300L);
+    }
 
     public List<LogBean> getLogData() {
-        List<LogBean> logBeans  = new ArrayList<>();
+        List<LogBean> logBeans = new ArrayList<>();
         String folderPath = CrashExpection.getInstance(getContext()).getPath();
         File f = new File(folderPath);
         if (!f.exists()) {//判断路径是否存在
@@ -206,10 +219,11 @@ public class SettingFragment extends BaseFragment {
                 return t1.createTime.compareTo(logBean.createTime);
             }
         });
-        return  logBeans;
+        return logBeans;
     }
 
     private static final String mformatType = "yyyy/MM/dd HH:mm:ss";
+
     public static String getFileLastModifiedTime(File file) {
         Calendar cal = Calendar.getInstance();
         long time = file.lastModified();

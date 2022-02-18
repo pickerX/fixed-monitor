@@ -18,4 +18,11 @@ public class CameraInfo {
         this.size = size;
         this.fps = fps;
     }
+
+    @Override
+    public String toString() {
+        return "CameraInfo{" +
+                "name='" + name + '\'' +
+                '}';
+    }
 }
