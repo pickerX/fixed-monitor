@@ -147,10 +147,11 @@ public class VideoListFragment extends BaseFragment {
 
     @Override
     public void doBusiness() {
+        dao = new VideoRecordDaoImpl(getContext());
         PopupInputPswView popupInputPswView = new PopupInputPswView(getContext(), new PopupInputPswView.PopupInputPswViewInterface() {
             @Override
             public void success() {
-                dao = new VideoRecordDaoImpl(getContext());
+
                 refreshLayout.autoRefresh();
             }
         });

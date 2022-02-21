@@ -109,49 +109,67 @@ public class XCamera {
     }
 
     public void prepare(Context context) {
+        lifeLogComm("开始初始化摄像头");
         mContext = context;
         mCameraManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
         initListener();
         try {
+//            Log.d(TAG,""+1/0);
             Log.d(TAG, "Flow: 1. fetch support cameras");
+            lifeLogComm("初始化摄像头");
             List<CameraInfo> cameras = enumerateVideoCameras(mCameraManager);
+            lifeLogComm("--->查找到的摄像头数量共" + cameras.size() + "个");
             // get best camera for now
             mFront = cameras.get(0);
             Log.d(TAG, "Flow: 2. find best camera:" + mFront);
+            lifeLogComm("--->以获取最佳摄像头:" + mFront.cameraId);
             mCharacteristics = mCameraManager.getCameraCharacteristics(mFront.cameraId);
             mOutputFile = CameraUtils.createFile(mContext, config.directory, "mp4");
             Log.d(TAG, "File prepared >>>>>" + mOutputFile.getAbsolutePath());
-
+            lifeLogComm("--->缓存文件准备完毕,路径:" + mOutputFile.getAbsolutePath());
             if (config.preview) {
                 mRecordSurface = createRecordSurface(mFront);
                 Log.d(TAG, "record surface prepared!!");
+                lifeLogComm("--->是否需要预览: true");
+            } else {
+                lifeLogComm("--->是否需要预览: false");
             }
             if (mPreviewSurface == null && config.preview) {
                 Log.e(TAG, "output target cannot be null");
+                lifeLogErro("--->无法获取预览控件，初始化失败1", null);
                 return;
             }
             // only support preview for now
-            if (mPreviewSurface == null) return;
+            if (mPreviewSurface == null) {
+                lifeLogErro("--->无法获取预览控件，初始化失败2", null);
+                return;
+            }
             Log.d(TAG, "Flow: 3. prepare surfaceView");
             SurfaceHolder holder = mPreviewSurface.getHolder();
             holder.addCallback(new SurfaceHolder.Callback() {
                 @Override
                 public void surfaceCreated(@NonNull SurfaceHolder surfaceHolder) {
+                    lifeLogComm("--->预览控件创建完毕");
                     // Selects appropriate preview size and configures view finder
                     Size previewSize = CameraUtils.getPreviewOutputSize(
                             mPreviewSurface.getDisplay(), mCharacteristics, SurfaceHolder.class, 0);
                     if (previewSize == null) {
                         Log.e(TAG, "Preview size cannot be null");
+                        lifeLogErro("--->预览控件Size异常，初始化失败3",null);
                         return;
                     }
                     Log.d(TAG, "Flow: 4. find best preview size:" + previewSize);
+                    lifeLogComm("--->预览控件Size获取成功，最佳尺寸:"+previewSize);
                     try {
                         mPreviewSurface.setAspectRatio(previewSize.getWidth(),
                                 previewSize.getHeight());
                         // To ensure that size is set, initialize camera in the view's thread
                         if (cameraLifecycle != null) cameraLifecycle.onPrepared();
-                    } catch (IllegalAccessException e) {
+
+                        lifeLogComm("--->初始化摄像头Success");
+                    } catch (Exception e) {
                         e.printStackTrace();
+                        lifeLogErro("--->异常捕获2，摄像头初始化失败，原因:" + e.getCause(), e);
                     }
                 }
 
@@ -165,11 +183,9 @@ public class XCamera {
 
                 }
             });
-        } catch (CameraAccessException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.e(TAG, "MediaRecorder prepare failed");
+            lifeLogErro("--->异常捕获1，摄像头初始化失败，原因:" + e.getCause(), e);
         }
 
     }
@@ -177,11 +193,13 @@ public class XCamera {
     public void start() {
         if (mPreviewSurface == null && config.preview) {
             Log.e(TAG, "output target cannot be null");
+            lifeLogErro("开始录像失败，无法获取预览控件",null);
             return;
         }
         assert mPreviewSurface != null;
         mPreviewSurface.post(() -> {
             Log.d(TAG, "Flow: 5. prepare done!");
+            lifeLogComm("开始进行录像");
             initializeCamera(mFront.cameraId);
         });
     }
@@ -199,8 +217,10 @@ public class XCamera {
     private void initializeCamera(String cameraId) {
         try {
             Log.d(TAG, "Flow: 6. open camera");
+            lifeLogComm("--->启动摄像头");
             openCamera(mCameraManager, cameraId, cameraHandler);
-        } catch (CameraAccessException e) {
+        } catch (Exception e) {
+            lifeLogErro("--->启动摄像头失败，原因:"+e.getCause(),e);
             e.printStackTrace();
         }
     }
@@ -213,12 +233,15 @@ public class XCamera {
             @Override
             public void onOpened(@NonNull CameraDevice cameraDevice) {
                 Log.d(TAG, "Flow: 7. Camera " + cameraId + " has been opened!!");
+                lifeLogComm("--->摄像头已开启");
                 try {
                     Log.d(TAG, "Flow: 8. creating camera capture session");
+                    lifeLogComm("--->创建摄像头session");
                     mCameraDevice = cameraDevice;
                     mTargets = getTargets();
                     createCaptureSession(cameraDevice, mTargets, handler);
-                } catch (CameraAccessException e) {
+                } catch (Exception e) {
+                    lifeLogErro("--->创建摄像头session失败，原因:"+e.getCause(),e);
                     e.printStackTrace();
                 }
             }
@@ -265,9 +288,11 @@ public class XCamera {
             @Override
             public void onConfigured(@NonNull CameraCaptureSession cameraCaptureSession) {
                 Log.d(TAG, "Flow: 9. Session configured!!");
+                lifeLogComm("--->创建摄像头session");
                 try {
                     mSession = cameraCaptureSession;
                     Log.d(TAG, "Flow: 10. create preview and record requests!!");
+                    lifeLogComm("--->映射预览控件与执行录制");
                     mPreviewRequest = createPreviewRequest(targets.get(0), mSession);
                     mRecordRequest = createVideoRequest(mSession,
                             mPreviewSurface.getHolder().getSurface(),
@@ -276,6 +301,7 @@ public class XCamera {
                     start(mSession, handler);
                 } catch (CameraAccessException | IOException e) {
                     e.printStackTrace();
+                    lifeLogErro("--->映射预览控件与执行录制失败,原因:"+e.getCause(),e);
                 }
             }
 
@@ -309,6 +335,7 @@ public class XCamera {
         // rotate by orientation
         int orientation = CameraUtils.computeRelativeRotation(mCharacteristics, rotation);
         Log.d(TAG, "record orientation:" + orientation);
+        lifeLogComm("--->record orientation:"+orientation);
         mRecorder.setOrientationHint(orientation);
         mRecorder.prepare();
         mRecorder.start();
@@ -316,7 +343,7 @@ public class XCamera {
         recordingStartMillis = System.currentTimeMillis();
         Log.d(TAG, "Flow: 11. Finalizes Recording started at " + recordingStartMillis);
         Log.d(TAG, "Recording started");
-
+        lifeLogComm("--->开始录制!");
         if (cameraLifecycle != null) cameraLifecycle.onStarted(recordingStartMillis);
         // Starts recording animation
         // fragmentCameraBinding.overlay.post(animationTask);
@@ -365,16 +392,18 @@ public class XCamera {
         // request next recording
         if (cameraLifecycle != null)
             cameraLifecycle.onStopped(recordingStopMillis, mOutputFile.getName(), mOutputFile.getAbsolutePath(), mOutputFile.length(), recordingStopMillis - recordingStartMillis, cover);
-
+        lifeLogComm("--->开始停止!");
     }
 
     public void restart() {
         mOutputFile = CameraUtils.createFile(mContext, config.directory, "mp4");
         mPreviewSurface.post(() -> {
             Log.d(TAG, "Flow: new capture session, start next record!");
+            lifeLogComm("--->创建新的录制,路径:"+mOutputFile.getAbsolutePath());
             try {
                 createCaptureSession(mCameraDevice, mTargets, cameraHandler);
             } catch (CameraAccessException e) {
+                lifeLogErro("--->创建新的录制失败，原因:"+e.getCause(),e);
                 e.printStackTrace();
             }
         });
@@ -542,5 +571,16 @@ public class XCamera {
 
     public void bindLifecycle(CameraLifecycle cameraLifecycle) {
         this.cameraLifecycle = cameraLifecycle;
+    }
+
+
+    public void lifeLogComm(String msg) {
+        if(cameraLifecycle!=null)
+        cameraLifecycle.lifeLog(0, msg, System.currentTimeMillis());
+    }
+
+    public void lifeLogErro(String msg, Exception e) {
+        if(cameraLifecycle!=null)
+        cameraLifecycle.lifeErro(msg, System.currentTimeMillis(), e);
     }
 }

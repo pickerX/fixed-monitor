@@ -20,12 +20,20 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.fixed.monitor.R;
+import com.fixed.monitor.base.CrashExpection;
+import com.fixed.monitor.base.adapter.MCommAdapter;
+import com.fixed.monitor.base.adapter.MCommVH;
+import com.fixed.monitor.bean.LifeLogBean;
 import com.fixed.monitor.bean.VideoRecordBean;
+import com.fixed.monitor.model.App;
 import com.fixed.monitor.model.dbdao.IVideoRecordDao;
 import com.fixed.monitor.model.dbdao.impl.VideoRecordDaoImpl;
 import com.fixed.monitor.util.MeasureUtil;
@@ -41,6 +49,8 @@ import com.lib.record.MonitorFactory;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import xyz.doikki.videoplayer.util.L;
 
 public class MonitorService extends Service {
     public static final String TAG = "MonitorService";
@@ -63,7 +73,9 @@ public class MonitorService extends Service {
     private View windowMainView;
     private AutoFitSurfaceView mAutoFitSurfaceView;
     private View record_view;
-    private TextView record_tv,state_tv;
+    private TextView record_tv, state_tv;
+    private RecyclerView lifelog_rcv;
+    private MCommAdapter<LifeLogBean> lifeLogBeanMCommAdapter;
 
     private static final Intent SERVICE_INTENT = new Intent();
 
@@ -203,6 +215,43 @@ public class MonitorService extends Service {
                     });
 //                EventBus.getDefault().post(new CEvent.MonitorRecordingEvent("录制暂停", 0));
             }
+
+            @Override
+            public void lifeLog(int type, String msg, long time) {
+                if (lifelog_rcv != null) {
+                    lifelog_rcv.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                lifeLogBeanMCommAdapter.addOneData(new LifeLogBean(type, msg, "", time));
+                                int itemCount = lifeLogBeanMCommAdapter.getItemCount() - 1;
+                                lifelog_rcv.smoothScrollToPosition(itemCount);
+                            } catch (Exception e) {
+                            }
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void lifeErro(String msg, long time, Exception e) {
+                if (lifelog_rcv != null) {
+                    lifelog_rcv.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                lifeLogBeanMCommAdapter.addOneData(new LifeLogBean(-1, msg, e.getMessage(), time));
+                                int itemCount = lifeLogBeanMCommAdapter.getItemCount() - 1;
+                                lifelog_rcv.smoothScrollToPosition(itemCount);
+                            } catch (Exception e) {
+                            }
+                        }
+                    });
+                }
+                if (CrashExpection.getInstance(App.getApp()) != null) {
+                    CrashExpection.getInstance(App.getApp()).saveExpectionFile(e);
+                }
+            }
         });
     }
 
@@ -211,6 +260,7 @@ public class MonitorService extends Service {
         record_view = windowMainView.findViewById(R.id.record_view);
         record_tv = windowMainView.findViewById(R.id.record_tv);
         state_tv = windowMainView.findViewById(R.id.state_tv);
+        lifelog_rcv = windowMainView.findViewById(R.id.lifelog_rcv);
         mAutoFitSurfaceView = windowMainView.findViewById(R.id.view_finder);
         //设置WindowManger布局参数以及相关属性
         mWindowManagerParams = new WindowManager.LayoutParams(
@@ -231,8 +281,39 @@ public class MonitorService extends Service {
         mAutoFitSurfaceView.setMaxSize(smallWidth, smallHeight);
         //获取WindowManager对象
         mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
-        record_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP,12);
-        state_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP,12);
+        record_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        state_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+
+
+        lifelog_rcv.setLayoutManager(new LinearLayoutManager(this));
+        ((FrameLayout.LayoutParams) lifelog_rcv.getLayoutParams()).width = MeasureUtil.getScreenWidth(this) / 4;
+        ((FrameLayout.LayoutParams) lifelog_rcv.getLayoutParams()).height = MeasureUtil.getScreenHeight(this) / 5*3;
+        lifeLogBeanMCommAdapter = new MCommAdapter<>(this, new MCommVH.MCommVHInterface<LifeLogBean>() {
+            @Override
+            public int setLayout() {
+                return R.layout.view_lifelog_item;
+            }
+
+            @Override
+            public void bindData(Context context, MCommVH mCommVH, int position, LifeLogBean lifeLogBean) {
+                mCommVH.setText(R.id.time_tv, ToolUtil.timestamp2String(lifeLogBean.createTime, "HH:mm:ss"));
+                TextView tv = (TextView) mCommVH.getView(R.id.tv);
+                switch (lifeLogBean.type) {
+                    case 0:
+                    default:
+                        tv.setTextColor(0xff00FF00);
+                        tv.setText(lifeLogBean.msg);
+                        break;
+                    case -1:
+                        tv.setTextColor(0xffFF0000);
+                        tv.setText(lifeLogBean.msg + "\n" + "-->" + lifeLogBean.erroMsg);
+                        break;
+                }
+
+            }
+        });
+        lifelog_rcv.setAdapter(lifeLogBeanMCommAdapter);
+        lifelog_rcv.setVisibility(View.GONE);
         try {
             mWindowManager.addView(windowMainView, mWindowManagerParams);
         } catch (Exception e) {
@@ -247,8 +328,8 @@ public class MonitorService extends Service {
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(isbind){
-                    return false ;
+                if (isbind) {
+                    return false;
                 }
                 final int action = event.getAction();
                 float x = event.getX();
@@ -326,9 +407,10 @@ public class MonitorService extends Service {
 //                mWindowManagerParams.gravity = Gravity.TOP | Gravity.LEFT;
                 mWindowManagerParams.width = parentView.getWidth();
                 mWindowManagerParams.height = parentView.getHeight();
-                record_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP,24);
-                state_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP,24);
+                record_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
+                state_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
                 mAutoFitSurfaceView.setMaxSize(MeasureUtil.getScreenWidth(MonitorService.this), MeasureUtil.getScreenHeight(MonitorService.this));
+                lifelog_rcv.setVisibility(View.VISIBLE);
                 mWindowManager.updateViewLayout(windowMainView, mWindowManagerParams);
             }
         });
@@ -342,8 +424,9 @@ public class MonitorService extends Service {
         mWindowManagerParams.width = smallWidth;
         mWindowManagerParams.height = smallHeight;
         mAutoFitSurfaceView.setMaxSize(smallWidth, smallHeight);
-        record_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP,12);
-        state_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP,12);
+        record_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        state_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        lifelog_rcv.setVisibility(View.GONE);
         mWindowManager.updateViewLayout(windowMainView, mWindowManagerParams);
 
         isbind = false;

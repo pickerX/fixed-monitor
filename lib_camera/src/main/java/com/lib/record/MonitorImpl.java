@@ -66,6 +66,18 @@ public class MonitorImpl implements Monitor {
                     dispatchNext();
                 }
             }
+
+            @Override
+            public void lifeLog(int type, String msg, long time) {
+                if (mStateCallback != null)
+                    mStateCallback.lifeLog(type,msg,time);
+            }
+
+            @Override
+            public void lifeErro(String msg, long time, Exception e) {
+                if(mStateCallback!=null)
+                    mStateCallback.lifeErro(msg,time,e);
+            }
         };
         this.mCamera.bindLifecycle(callback);
     }

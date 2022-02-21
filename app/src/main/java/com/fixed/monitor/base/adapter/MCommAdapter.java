@@ -78,6 +78,27 @@ public class MCommAdapter<B extends Object> extends MBaseAdapter<MCommVH> {
     }
 
 
+    public void addOneData(B b, int index) {
+        this.beanList.add(index, b);
+        isEmpty = false;
+        if (showEmptyView && this.beanList.size() == 0) {
+            isEmpty = true;
+        }
+        notifyDataSetChanged();
+//        mCommAdapterInterface.isNoData(getItemCount() <= 0);
+    }
+
+    public void addOneData(B b) {
+        this.beanList.add(b);
+        isEmpty = false;
+        if (showEmptyView && this.beanList.size() == 0) {
+            isEmpty = true;
+        }
+        notifyDataSetChanged();
+//        mCommAdapterInterface.i
+    }
+
+
     @Override
     public int getItemCount() {
         return isEmpty ? 1 : beanList.size();
@@ -96,7 +117,7 @@ public class MCommAdapter<B extends Object> extends MBaseAdapter<MCommVH> {
 
     @Override
     public MCommVH onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (viewType==-1) {
+        if (viewType == -1) {
             return new MCommVH(mLayoutInflater.inflate(R.layout.view_listdata_empty,
                     parent, false), mContext, mCommVHInterface);
         }

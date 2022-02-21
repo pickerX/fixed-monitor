@@ -3,6 +3,7 @@ package com.fixed.monitor.base;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.fixed.monitor.bean.LifeLogBean;
 import com.fixed.monitor.bean.VideoRecordBean;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.Dao;
@@ -15,7 +16,7 @@ import java.util.Map;
 
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
-	private static final int db_version = 7;
+	private static final int db_version = 8;
 	private static final String TABLE_NAME = "fixedmonitor-sqlite.db";
 	private Map<String, Dao> daos = new HashMap<String, Dao>();
 
@@ -28,6 +29,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			ConnectionSource connectionSource) {
 		try {
 			TableUtils.createTable(connectionSource, VideoRecordBean.class);
+			TableUtils.createTable(connectionSource, LifeLogBean.class);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -39,6 +41,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 		if (newVersion != oldVersion) {
 			try {
 				TableUtils.dropTable(connectionSource, VideoRecordBean.class,
+						true);
+				TableUtils.dropTable(connectionSource, LifeLogBean.class,
 						true);
 				onCreate(database, connectionSource);
 			} catch (SQLException e) {

@@ -15,4 +15,7 @@ public interface CameraLifecycle {
 
     void onStopped(long stopMillis, String name, String path, long size,long duringTime,String coverPath);
 
+    void lifeLog(int type,String msg,long time);
+
+    void lifeErro(String msg,long time,Exception e);
 }

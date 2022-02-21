@@ -105,11 +105,19 @@ public class CrashExpection implements UncaughtExceptionHandler {
 				Looper.loop();
 			}
 		}.start();
+//		// 收集设备参数信息
+//		collectDeviceInfo(mContext);
+//		// 保存日志文件
+//		saveCrashInfo2File(ex);
+		saveCrashInfo2File(ex);
+		return false;
+	}
+
+	public void saveExpectionFile(Throwable ex){
 		// 收集设备参数信息
 		collectDeviceInfo(mContext);
 		// 保存日志文件
 		saveCrashInfo2File(ex);
-		return false;
 	}
 
 	/**
