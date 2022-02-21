@@ -392,14 +392,14 @@ public class XCamera {
         // request next recording
         if (cameraLifecycle != null)
             cameraLifecycle.onStopped(recordingStopMillis, mOutputFile.getName(), mOutputFile.getAbsolutePath(), mOutputFile.length(), recordingStopMillis - recordingStartMillis, cover);
-        lifeLogComm("--->开始停止!");
+        lifeLogComm("--->录像停止!");
     }
 
     public void restart() {
         mOutputFile = CameraUtils.createFile(mContext, config.directory, "mp4");
         mPreviewSurface.post(() -> {
             Log.d(TAG, "Flow: new capture session, start next record!");
-            lifeLogComm("--->创建新的录制,路径:"+mOutputFile.getAbsolutePath());
+            lifeLogComm("--->开始创建新的录制,路径:"+mOutputFile.getAbsolutePath());
             try {
                 createCaptureSession(mCameraDevice, mTargets, cameraHandler);
             } catch (CameraAccessException e) {
