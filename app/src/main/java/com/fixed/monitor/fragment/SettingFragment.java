@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -68,6 +69,12 @@ public class SettingFragment extends BaseFragment {
                     @Override
                     public void success() {
                         popupSetPswView.showCenter(setPsw_rl);
+                    }
+
+                    @Override
+                    public void cancel() {
+                        Navigation.findNavController(requireActivity(), R.id.fragment_container)
+                                .navigate(R.id.camera_fragment);
                     }
                 });
         popupSetPswView = new PopupSetPswView(getContext());
@@ -166,6 +173,12 @@ public class SettingFragment extends BaseFragment {
             @Override
             public void success() {
 
+            }
+
+            @Override
+            public void cancel() {
+                Navigation.findNavController(requireActivity(), R.id.fragment_container)
+                        .navigate(R.id.camera_fragment);
             }
         });
         popupInputPswView.showCenter(setPsw_rl);

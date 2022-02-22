@@ -55,6 +55,11 @@ public class SettingAct extends BaseAct {
                     public void success() {
                         popupSetPswView.showCenter(setpsw_fl);
                     }
+
+                    @Override
+                    public void cancel() {
+
+                    }
                 });
 
         setpsw_fl = findViewById(R.id.setpsw_fl);

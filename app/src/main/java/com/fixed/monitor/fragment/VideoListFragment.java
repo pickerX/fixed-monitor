@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -151,8 +152,13 @@ public class VideoListFragment extends BaseFragment {
         PopupInputPswView popupInputPswView = new PopupInputPswView(getContext(), new PopupInputPswView.PopupInputPswViewInterface() {
             @Override
             public void success() {
-
                 refreshLayout.autoRefresh();
+            }
+
+            @Override
+            public void cancel() {
+                Navigation.findNavController(requireActivity(), R.id.fragment_container)
+                        .navigate(R.id.camera_fragment);
             }
         });
         popupInputPswView.showCenter(refreshLayout);

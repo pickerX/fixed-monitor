@@ -129,8 +129,8 @@ public class MonitorService extends Service {
         }
         mBinder = new MonitorServiceBinder();
 
-        smallWidth = MeasureUtil.dip2px(this, 300);
-        smallHeight = MeasureUtil.dip2px(this, 200);
+        smallWidth = MeasureUtil.dip2px(this, 1);
+        smallHeight = MeasureUtil.dip2px(this, 1);
 
         initSqlDao();
         initWindowMangerView();

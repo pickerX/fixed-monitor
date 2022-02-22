@@ -4,13 +4,11 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.fixed.monitor.R;
 import com.fixed.monitor.base.PopupBaseView;
-import com.fixed.monitor.util.MeasureUtil;
 import com.fixed.monitor.util.PasswordUtil;
 import com.fixed.monitor.util.T;
 import com.fixed.monitor.view.MsCodeInputView;
@@ -19,13 +17,16 @@ public class PopupInputPswView extends PopupBaseView {
 
     private MsCodeInputView mscode_ipv;
     private TextView commit_tv;
+    private TextView cancel_tv;
     private PopupInputPswViewInterface inputPswViewInterface;
 
-    public interface PopupInputPswViewInterface{
+    public interface PopupInputPswViewInterface {
         void success();
+
+        void cancel();
     }
 
-    public PopupInputPswView(Context context,PopupInputPswViewInterface inputPswViewInterface) {
+    public PopupInputPswView(Context context, PopupInputPswViewInterface inputPswViewInterface) {
         super(context);
         this.inputPswViewInterface = inputPswViewInterface;
     }
@@ -49,6 +50,7 @@ public class PopupInputPswView extends PopupBaseView {
     @Override
     public void initPopupView() {
         commit_tv = popView.findViewById(R.id.commit_tv);
+        cancel_tv = popView.findViewById(R.id.cancel_tv);
         mscode_ipv = popView.findViewById(R.id.mscode_ipv);
         mscode_ipv.setOnMsCodeInterface(new MsCodeInputView.MsCodeInterface() {
             @Override
@@ -64,23 +66,27 @@ public class PopupInputPswView extends PopupBaseView {
         commit_tv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(PasswordUtil.getPsw(context).equals(mscode_ipv.getNowText())){
-                   dismiss();
-                   mscode_ipv.clearText();
-                   if(inputPswViewInterface!=null){
-                       inputPswViewInterface.success();
-                   }
-                }else{
-                    T.showShort(context,"密码错误");
+                if (PasswordUtil.getPsw(context).equals(mscode_ipv.getNowText())) {
+                    dismiss();
+                    mscode_ipv.clearText();
+                    if (inputPswViewInterface != null) {
+                        inputPswViewInterface.success();
+                    }
+                } else {
+                    T.showShort(context, "密码错误");
                 }
             }
+        });
+        cancel_tv.setOnClickListener(view -> {
+            dismiss();
+            if (inputPswViewInterface != null) inputPswViewInterface.cancel();
         });
     }
 
     @Override
     public boolean needBgAlpha() {
 //        return super.needBgAlpha();
-    return false;
+        return false;
     }
 
     @Override

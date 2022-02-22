@@ -1,9 +1,7 @@
 package com.lib.camera;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
-import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
@@ -31,6 +29,7 @@ import androidx.annotation.NonNull;
 import com.lib.camera.view.AutoFitSurfaceView;
 import com.lib.record.Config;
 import com.lib.record.Monitor;
+import com.lib.util.StorageUtil;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -513,6 +512,7 @@ public class XCamera {
         // unconstrained video recording with high enough FPS for some use cases and they will
         // not necessarily declare constrained high speed video capability.
         String[] ids = cameraManager.getCameraIdList();
+
         for (String id : ids) {
             CameraCharacteristics characteristics = cameraManager.getCameraCharacteristics(id);
             String orientation = lensOrientationString(
@@ -524,10 +524,10 @@ public class XCamera {
                     CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
 
             boolean filter = config.cameraOrientation.equals(orientation);
-
+            boolean hasCapability = hasCapability(capabilities, CameraCharacteristics
+                    .REQUEST_AVAILABLE_CAPABILITIES_BACKWARD_COMPATIBLE);
             // Return cameras that declare to be backward compatible
-            if (filter && hasCapability(capabilities, CameraCharacteristics
-                    .REQUEST_AVAILABLE_CAPABILITIES_BACKWARD_COMPATIBLE)) {
+            if (filter && hasCapability) {
                 // Recording should always be done in the most efficient format, which is
                 //  the format native to the camera framework
                 Class<MediaRecorder> targetClass = MediaRecorder.class;
