@@ -154,11 +154,11 @@ public class XCamera {
                             mPreviewSurface.getDisplay(), mCharacteristics, SurfaceHolder.class, 0);
                     if (previewSize == null) {
                         Log.e(TAG, "Preview size cannot be null");
-                        lifeLogErro("--->预览控件Size异常，初始化失败3",null);
+                        lifeLogErro("--->预览控件Size异常，初始化失败3", null);
                         return;
                     }
                     Log.d(TAG, "Flow: 4. find best preview size:" + previewSize);
-                    lifeLogComm("--->预览控件Size获取成功，最佳尺寸:"+previewSize);
+                    lifeLogComm("--->预览控件Size获取成功，最佳尺寸:" + previewSize);
                     try {
                         mPreviewSurface.setAspectRatio(previewSize.getWidth(),
                                 previewSize.getHeight());
@@ -192,7 +192,7 @@ public class XCamera {
     public void start() {
         if (mPreviewSurface == null && config.preview) {
             Log.e(TAG, "output target cannot be null");
-            lifeLogErro("开始录像失败，无法获取预览控件",null);
+            lifeLogErro("开始录像失败，无法获取预览控件", null);
             return;
         }
         assert mPreviewSurface != null;
@@ -219,7 +219,7 @@ public class XCamera {
             lifeLogComm("--->启动摄像头");
             openCamera(mCameraManager, cameraId, cameraHandler);
         } catch (Exception e) {
-            lifeLogErro("--->启动摄像头失败，原因:"+e.getCause(),e);
+            lifeLogErro("--->启动摄像头失败，原因:" + e.getCause(), e);
             e.printStackTrace();
         }
     }
@@ -240,7 +240,7 @@ public class XCamera {
                     mTargets = getTargets();
                     createCaptureSession(cameraDevice, mTargets, handler);
                 } catch (Exception e) {
-                    lifeLogErro("--->创建摄像头session失败，原因:"+e.getCause(),e);
+                    lifeLogErro("--->创建摄像头session失败，原因:" + e.getCause(), e);
                     e.printStackTrace();
                 }
             }
@@ -300,7 +300,7 @@ public class XCamera {
                     start(mSession, handler);
                 } catch (CameraAccessException | IOException e) {
                     e.printStackTrace();
-                    lifeLogErro("--->映射预览控件与执行录制失败,原因:"+e.getCause(),e);
+                    lifeLogErro("--->映射预览控件与执行录制失败,原因:" + e.getCause(), e);
                 }
             }
 
@@ -334,7 +334,7 @@ public class XCamera {
         // rotate by orientation
         int orientation = CameraUtils.computeRelativeRotation(mCharacteristics, rotation);
         Log.d(TAG, "record orientation:" + orientation);
-        lifeLogComm("--->record orientation:"+orientation);
+        lifeLogComm("--->record orientation:" + orientation);
         mRecorder.setOrientationHint(orientation);
         mRecorder.prepare();
         mRecorder.start();
@@ -398,11 +398,11 @@ public class XCamera {
         mOutputFile = CameraUtils.createFile(mContext, config.directory, "mp4");
         mPreviewSurface.post(() -> {
             Log.d(TAG, "Flow: new capture session, start next record!");
-            lifeLogComm("--->开始创建新的录制,路径:"+mOutputFile.getAbsolutePath());
+            lifeLogComm("--->开始创建新的录制,路径:" + mOutputFile.getAbsolutePath());
             try {
                 createCaptureSession(mCameraDevice, mTargets, cameraHandler);
             } catch (CameraAccessException e) {
-                lifeLogErro("--->创建新的录制失败，原因:"+e.getCause(),e);
+                lifeLogErro("--->创建新的录制失败，原因:" + e.getCause(), e);
                 e.printStackTrace();
             }
         });
@@ -512,7 +512,7 @@ public class XCamera {
         // unconstrained video recording with high enough FPS for some use cases and they will
         // not necessarily declare constrained high speed video capability.
         String[] ids = cameraManager.getCameraIdList();
-
+        lifeLogComm("--->CameraIdList Size:" + ids.length + ",[" + ids.toString() + "]");
         for (String id : ids) {
             CameraCharacteristics characteristics = cameraManager.getCameraCharacteristics(id);
             String orientation = lensOrientationString(
@@ -524,10 +524,13 @@ public class XCamera {
                     CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
 
             boolean filter = config.cameraOrientation.equals(orientation);
-            boolean hasCapability = hasCapability(capabilities, CameraCharacteristics
-                    .REQUEST_AVAILABLE_CAPABILITIES_BACKWARD_COMPATIBLE);
+            lifeLogComm("--->CameraId:" + id + "== capabilities[" + capabilities.toString() + "],filter:" + filter + ", hasCapability:" + hasCapability(capabilities, CameraCharacteristics
+                    .REQUEST_AVAILABLE_CAPABILITIES_BACKWARD_COMPATIBLE));
             // Return cameras that declare to be backward compatible
-            if (filter && hasCapability) {
+//            if (filter && hasCapability(capabilities, CameraCharacteristics
+//                    .REQUEST_AVAILABLE_CAPABILITIES_BACKWARD_COMPATIBLE)) {
+            if (hasCapability(capabilities, CameraCharacteristics
+                    .REQUEST_AVAILABLE_CAPABILITIES_BACKWARD_COMPATIBLE)) {
                 // Recording should always be done in the most efficient format, which is
                 //  the format native to the camera framework
                 Class<MediaRecorder> targetClass = MediaRecorder.class;
@@ -575,12 +578,12 @@ public class XCamera {
 
 
     public void lifeLogComm(String msg) {
-        if(cameraLifecycle!=null)
-        cameraLifecycle.lifeLog(0, msg, System.currentTimeMillis());
+        if (cameraLifecycle != null)
+            cameraLifecycle.lifeLog(0, msg, System.currentTimeMillis());
     }
 
     public void lifeLogErro(String msg, Exception e) {
-        if(cameraLifecycle!=null)
-        cameraLifecycle.lifeErro(msg, System.currentTimeMillis(), e);
+        if (cameraLifecycle != null)
+            cameraLifecycle.lifeErro(msg, System.currentTimeMillis(), e);
     }
 }

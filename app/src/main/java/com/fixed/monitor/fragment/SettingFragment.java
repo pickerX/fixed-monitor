@@ -10,6 +10,7 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.fixed.monitor.MainActivity;
 import com.fixed.monitor.R;
 import com.fixed.monitor.base.BaseFragment;
 import com.fixed.monitor.base.CrashExpection;
@@ -177,8 +178,12 @@ public class SettingFragment extends BaseFragment {
 
             @Override
             public void cancel() {
-                Navigation.findNavController(requireActivity(), R.id.fragment_container)
-                        .navigate(R.id.camera_fragment);
+                try {
+                    ((MainActivity) requireActivity()).tabClick(0);
+                }catch (Exception e){
+                }
+//                Navigation.findNavController(requireActivity(), R.id.fragment_container)
+//                        .navigate(R.id.camera_fragment);
             }
         });
         popupInputPswView.showCenter(setPsw_rl);

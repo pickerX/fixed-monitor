@@ -168,6 +168,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void tabClick(int i){
+        try{
+            tab_ll[i].performClick();
+        }catch (Exception e){
+        }
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();

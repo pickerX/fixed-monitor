@@ -14,6 +14,7 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.fixed.monitor.MainActivity;
 import com.fixed.monitor.R;
 import com.fixed.monitor.base.BaseFragment;
 import com.fixed.monitor.base.adapter.MCommAdapter;
@@ -62,6 +63,7 @@ public class VideoListFragment extends BaseFragment {
 
     @Override
     public void initView(View view) {
+        dao = new VideoRecordDaoImpl(getContext());
         searchDate_tv = view.findViewById(R.id.searchDate_tv);
         refreshLayout = view.findViewById(R.id.refreshLayout);
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
@@ -157,8 +159,12 @@ public class VideoListFragment extends BaseFragment {
 
             @Override
             public void cancel() {
-                Navigation.findNavController(requireActivity(), R.id.fragment_container)
-                        .navigate(R.id.camera_fragment);
+//                Navigation.findNavController(requireActivity(), R.id.fragment_container)
+//                        .navigate(R.id.camera_fragment);
+                try {
+                    ((MainActivity) requireActivity()).tabClick(0);
+                }catch (Exception e){
+                }
             }
         });
         popupInputPswView.showCenter(refreshLayout);
