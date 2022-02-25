@@ -9,12 +9,14 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
@@ -47,10 +49,14 @@ public class PermissionsFragment extends Fragment {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
                 && !Settings.canDrawOverlays(getContext())) {
-            requestOverlay(this::requestCamera);
-        } else {
-            requestCamera();
+            requestOverlay();
         }
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        requestExternalStorage(this::requestCamera);
     }
 
     private void requestCamera() {
@@ -79,13 +85,18 @@ public class PermissionsFragment extends Fragment {
         session.launch(PERMISSIONS_REQUIRED);
     }
 
+    private final Handler handler = new Handler();
+
     private void navigate() {
-        Navigation.findNavController(requireActivity(), R.id.fragment_container).navigate(
-                PermissionsFragmentDirections.actionPermissionsToXcamera());
+        handler.postDelayed(() -> {
+            // 等待权限完全申请结束
+            Navigation.findNavController(requireActivity(), R.id.fragment_container).navigate(
+                    PermissionsFragmentDirections.actionPermissionsToXcamera());
+        }, 500L);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    private void requestOverlay(Runnable next) {
+    private void requestOverlay() {
         Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
         intent.setData(Uri.parse("package:" + requireContext().getPackageName()));
 
@@ -93,15 +104,15 @@ public class PermissionsFragment extends Fragment {
                 new ActivityResultContracts.StartActivityForResult();
         ActivityResultLauncher<Intent> session = registerForActivityResult(contract, result -> {
             if (Settings.canDrawOverlays(getContext())) {
-                next.run();
+                Log.d("Permission", "获取到悬浮窗权限");
             }
         });
         session.launch(intent);
     }
 
-    private void requestExternalStorage() {
+    private void requestExternalStorage(Runnable next) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-            if (Environment.isExternalStorageManager()) {
+            if (!Environment.isExternalStorageManager()) {
                 // API 30 获取全部存储权限
                 Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
                 intent.setData(Uri.parse("package:" + requireContext().getPackageName()));
@@ -111,12 +122,18 @@ public class PermissionsFragment extends Fragment {
                 ActivityResultLauncher<Intent> session = registerForActivityResult(contract, result -> {
                     if (Environment.isExternalStorageManager()) {
                         Log.d("Permission", "获取全部文件权限");
+                        next.run();
                     } else {
                         Log.e("Permission", "获取全部文件权限失败");
                     }
                 });
                 session.launch(intent);
+            } else {
+                Log.e("Permission", "已获取全部文件权限");
+                next.run();
             }
+        } else {
+            next.run();
         }
     }
 
