@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="com.fixed.monitor"
     android:installLocation="internalOnly">
 
@@ -23,11 +22,12 @@
         android:name=".model.App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_applogov3"
+        android:installLocation="preferExternal"
         android:label="@string/app_name"
         android:networkSecurityConfig="@xml/network_security_config"
-        android:roundIcon="@mipmap/ic_applogov3"
-        android:requestLegacyExternalStorage="true"
         android:preserveLegacyExternalStorage="true"
+        android:requestLegacyExternalStorage="true"
+        android:roundIcon="@mipmap/ic_applogov3"
         android:supportsRtl="true"
         android:theme="@style/Theme.FixedMonitor">
 
@@ -45,8 +45,8 @@
 
         <activity
             android:name=".model.video.VideoPlayerAct"
-            android:screenOrientation="landscape"
-            android:configChanges="orientation|screenSize|keyboardHidden" />
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:screenOrientation="landscape" />
         <activity android:name=".model.video.VideoListAct" />
         <activity android:name=".model.setting.SettingAct" />
         <activity android:name=".model.log.LogListAct" />
@@ -63,17 +63,17 @@
             </intent-filter>
         </receiver>
 
-<!--        <provider-->
-<!--            android:name="androidx.core.content.FileProvider"-->
-<!--            android:authorities="com.fixed.monitor.fileprovider"-->
-<!--            android:exported="false"-->
-<!--            android:grantUriPermissions="true"-->
-<!--            tools:replace="android:authorities">-->
-<!--            <meta-data-->
-<!--                android:name="android.support.FILE_PROVIDER_PATHS"-->
-<!--                android:resource="@xml/filepaths"-->
-<!--                tools:replace="android:resource" />-->
-<!--        </provider>-->
+        <!--        <provider-->
+        <!--            android:name="androidx.core.content.FileProvider"-->
+        <!--            android:authorities="com.fixed.monitor.fileprovider"-->
+        <!--            android:exported="false"-->
+        <!--            android:grantUriPermissions="true"-->
+        <!--            tools:replace="android:authorities">-->
+        <!--            <meta-data-->
+        <!--                android:name="android.support.FILE_PROVIDER_PATHS"-->
+        <!--                android:resource="@xml/filepaths"-->
+        <!--                tools:replace="android:resource" />-->
+        <!--        </provider>-->
 
     </application>
 
