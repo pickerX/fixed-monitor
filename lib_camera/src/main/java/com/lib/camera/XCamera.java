@@ -72,7 +72,7 @@ public class XCamera {
      */
     private final Handler cameraHandler;
 
-    private static final int RECORDER_VIDEO_BITRATE = 500 * 1024;
+    private static final int RECORDER_VIDEO_BITRATE = 10_000_000;
     private Context mContext;
     private CameraInfo mFront;
 
@@ -330,8 +330,8 @@ public class XCamera {
         // Finalizes recorder setup and starts recording
         mRecorder = createRecorder(mRecordSurface,
                 mFront.fps,
-                Math.min(mFront.size.getWidth(), 1280),
-                Math.min(mFront.size.getHeight(), 720),
+                Math.min(mFront.size.getWidth(), CameraUtils.SIZE_1080P.width()),
+                Math.min(mFront.size.getHeight(), CameraUtils.SIZE_1080P.height()),
                 mOutputFile.getAbsolutePath());
         // rotate by orientation
         int orientation = CameraUtils.computeRelativeRotation(mCharacteristics, rotation);
@@ -416,8 +416,8 @@ public class XCamera {
             surface = MediaCodec.createPersistentInputSurface();
             MediaRecorder mr = createRecorder(surface,
                     front.fps,
-                    front.size.getWidth() > 1920 ? 1920 : front.size.getWidth(),
-                    front.size.getHeight() > 1080 ? 1080 : front.size.getHeight(),
+                    Math.min(front.size.getWidth(), CameraUtils.SIZE_1080P.width()),
+                    Math.min(front.size.getHeight(), CameraUtils.SIZE_1080P.height()),
                     mOutputFile.getAbsolutePath());
             mr.prepare();
             mr.release();
@@ -435,13 +435,13 @@ public class XCamera {
         MediaRecorder mr = new MediaRecorder();
         mr.setAudioSource(MediaRecorder.AudioSource.MIC);
         mr.setVideoSource(MediaRecorder.VideoSource.SURFACE);
-        mr.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        mr.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
         mr.setOutputFile(directory);
         mr.setVideoEncodingBitRate(RECORDER_VIDEO_BITRATE);
         if (fps > 0) mr.setVideoFrameRate(fps);
 
         mr.setVideoSize(width, height);
-        mr.setVideoEncoder(MediaRecorder.VideoEncoder.H263);
+        mr.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
         mr.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             mr.setInputSurface(surface);

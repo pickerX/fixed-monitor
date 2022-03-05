@@ -205,6 +205,14 @@ class SmartSize {
         size = new Size(x, y);
     }
 
+    public int width() {
+        return size.getWidth();
+    }
+
+    public int height() {
+        return size.getHeight();
+    }
+
     public int max() {
         return Math.max(size.getWidth(), size.getHeight());
     }
