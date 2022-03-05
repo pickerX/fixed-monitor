@@ -29,7 +29,6 @@ import androidx.annotation.NonNull;
 import com.lib.camera.view.AutoFitSurfaceView;
 import com.lib.record.Config;
 import com.lib.record.Monitor;
-import com.lib.util.StorageUtil;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -73,7 +72,7 @@ public class XCamera {
      */
     private final Handler cameraHandler;
 
-    private static final int RECORDER_VIDEO_BITRATE = 10_000_000;
+    private static final int RECORDER_VIDEO_BITRATE = 500 * 1024;
     private Context mContext;
     private CameraInfo mFront;
 
@@ -123,7 +122,7 @@ public class XCamera {
             Log.d(TAG, "Flow: 2. find best camera:" + mFront);
             lifeLogComm("--->以获取最佳摄像头:" + mFront.cameraId);
             mCharacteristics = mCameraManager.getCameraCharacteristics(mFront.cameraId);
-            mOutputFile = CameraUtils.createFile(mContext, config.directory, "mp4");
+            mOutputFile = CameraUtils.createFile(mContext, config.directory, CameraUtils.extensions);
             Log.d(TAG, "File prepared >>>>>" + mOutputFile.getAbsolutePath());
             lifeLogComm("--->缓存文件准备完毕,路径:" + mOutputFile.getAbsolutePath());
             if (config.preview) {
@@ -328,8 +327,8 @@ public class XCamera {
         // Finalizes recorder setup and starts recording
         mRecorder = createRecorder(mRecordSurface,
                 mFront.fps,
-                mFront.size.getWidth() > 1920 ? 1920 : mFront.size.getWidth(),
-                mFront.size.getHeight() > 1080 ? 1080 : mFront.size.getHeight(),
+                Math.min(mFront.size.getWidth(), 1280),
+                Math.min(mFront.size.getHeight(), 720),
                 mOutputFile.getAbsolutePath());
         // rotate by orientation
         int orientation = CameraUtils.computeRelativeRotation(mCharacteristics, rotation);
@@ -395,7 +394,7 @@ public class XCamera {
     }
 
     public void restart() {
-        mOutputFile = CameraUtils.createFile(mContext, config.directory, "mp4");
+        mOutputFile = CameraUtils.createFile(mContext, config.directory, CameraUtils.extensions);
         mPreviewSurface.post(() -> {
             Log.d(TAG, "Flow: new capture session, start next record!");
             lifeLogComm("--->开始创建新的录制,路径:" + mOutputFile.getAbsolutePath());
@@ -433,17 +432,32 @@ public class XCamera {
         MediaRecorder mr = new MediaRecorder();
         mr.setAudioSource(MediaRecorder.AudioSource.MIC);
         mr.setVideoSource(MediaRecorder.VideoSource.SURFACE);
-        mr.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+        mr.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
         mr.setOutputFile(directory);
         mr.setVideoEncodingBitRate(RECORDER_VIDEO_BITRATE);
         if (fps > 0) mr.setVideoFrameRate(fps);
 
         mr.setVideoSize(width, height);
-        mr.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+        mr.setVideoEncoder(MediaRecorder.VideoEncoder.H263);
         mr.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             mr.setInputSurface(surface);
         }
+        mr.setOnErrorListener(new MediaRecorder.OnErrorListener() {
+            @Override
+            public void onError(MediaRecorder mediaRecorder, int i, int i1) {
+                Log.e(TAG, "errorCode:" + i + " msg:" + i1);
+                lifeLogErro("MediaRecorder error:"
+                        + i + " extra:" + i1, null);
+            }
+        });
+        mr.setOnInfoListener(new MediaRecorder.OnInfoListener() {
+            @Override
+            public void onInfo(MediaRecorder mediaRecorder, int i, int i1) {
+                Log.e(TAG, "onInfo:" + i + " msg:" + i1);
+                lifeLogComm("MediaRecorder onInfo:" + i + " extra:" + i1);
+            }
+        });
         return mr;
     }
 

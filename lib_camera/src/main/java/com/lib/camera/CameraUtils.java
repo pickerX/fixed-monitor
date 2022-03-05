@@ -15,7 +15,6 @@ import com.lib.record.Monitor;
 import com.lib.util.StorageUtil;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -27,6 +26,7 @@ import java.util.Locale;
  * @date 2022/1/28 4:34 下午
  */
 public class CameraUtils {
+    public static final String extensions = "3gp";
 
     public static File getDefaultDir(Context context, String dir) {
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
@@ -119,7 +119,7 @@ public class CameraUtils {
         return validSizes[target].size;
     }
 
-    static SmartSize SIZE_1080P = new SmartSize(1920, 1080);
+    static SmartSize SIZE_1080P = new SmartSize(1280, 720);
 
     public static int computeRelativeRotation(
             CameraCharacteristics characteristics,
