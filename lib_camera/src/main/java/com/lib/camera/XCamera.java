@@ -173,12 +173,12 @@ public class XCamera {
 
                 @Override
                 public void surfaceChanged(@NonNull SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-
+                    lifeLogComm("--->surface发生变化");
                 }
 
                 @Override
                 public void surfaceDestroyed(@NonNull SurfaceHolder surfaceHolder) {
-
+                    lifeLogComm("--->surface被销毁");
                 }
             });
         } catch (Exception e) {
@@ -247,11 +247,13 @@ public class XCamera {
             @Override
             public void onDisconnected(@NonNull CameraDevice cameraDevice) {
                 Log.w(TAG, "Camera " + cameraId + " has been disconnected");
+                lifeLogErro("Camera 断开连接", null);
             }
 
             @Override
             public void onError(@NonNull CameraDevice cameraDevice, int i) {
                 Log.e(TAG, "Camera " + cameraId + " open failed!!");
+                lifeLogErro("Camera打开失败,code:" + i, null);
                 switch (i) {
                     case ERROR_CAMERA_DISABLED:
                         Log.e(TAG, ">>> error camera disabled");
@@ -306,6 +308,7 @@ public class XCamera {
             @Override
             public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
                 Log.e(TAG, "Camera " + device.getId() + " session configuration failed");
+                lifeLogErro("Camera session 配置失败", null);
                 mSession = null;
             }
         };
@@ -483,7 +486,7 @@ public class XCamera {
                 .createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
         request.addTarget(outputTargetView);
         request.addTarget(outputTarget);
-        request.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, new Range(fps, fps));
+        request.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, new Range<Integer>(fps, fps));
 
         return request.build();
     }
