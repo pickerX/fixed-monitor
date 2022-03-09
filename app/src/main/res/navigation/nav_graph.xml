@@ -46,7 +46,7 @@
 
     <fragment
         android:id="@+id/camera_fragment"
-        android:name="com.fixed.monitor.fragment.CameraFragment"
+        android:name="com.fixed.monitor.fragment.CameraXFragment"
         android:label="Camera">
         <action
             android:id="@+id/action_camera_to_permissions"

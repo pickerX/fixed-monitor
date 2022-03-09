@@ -24,6 +24,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.camera.view.PreviewView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -71,7 +72,8 @@ public class MonitorService extends Service {
     private WindowManager.LayoutParams mWindowManagerParams;
     private int smallWidth, smallHeight;
     private View windowMainView;
-    private AutoFitSurfaceView mAutoFitSurfaceView;
+//    private AutoFitSurfaceView mAutoFitSurfaceView;
+    private PreviewView mAutoFitSurfaceView;
     private View record_view;
     private TextView record_tv, state_tv;
     private RecyclerView lifelog_rcv;
@@ -163,6 +165,7 @@ public class MonitorService extends Service {
                 .setDirectory(directory)
                 .setPreview(true)
                 .setLoop(true)
+                .setCameraX(true)
                 .build();
 
         monitor = MonitorFactory.getInstance().create(config);
@@ -278,7 +281,8 @@ public class MonitorService extends Service {
         } else {
             mWindowManagerParams.type = WindowManager.LayoutParams.TYPE_PHONE;
         }
-        mAutoFitSurfaceView.setMaxSize(smallWidth, smallHeight);
+        // TODO PreviewView resize
+        // mAutoFitSurfaceView.setMaxSize(smallWidth, smallHeight);
         //获取WindowManager对象
         mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         record_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
@@ -409,7 +413,7 @@ public class MonitorService extends Service {
                 mWindowManagerParams.height = parentView.getHeight();
                 record_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
                 state_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
-                mAutoFitSurfaceView.setMaxSize(MeasureUtil.getScreenWidth(MonitorService.this), MeasureUtil.getScreenHeight(MonitorService.this));
+                // mAutoFitSurfaceView.setMaxSize(MeasureUtil.getScreenWidth(MonitorService.this), MeasureUtil.getScreenHeight(MonitorService.this));
                 lifelog_rcv.setVisibility(View.VISIBLE);
                 mWindowManager.updateViewLayout(windowMainView, mWindowManagerParams);
             }
@@ -423,7 +427,7 @@ public class MonitorService extends Service {
 //        mWindowManagerParams.gravity = Gravity.BOTTOM | Gravity.LEFT;
         mWindowManagerParams.width = smallWidth;
         mWindowManagerParams.height = smallHeight;
-        mAutoFitSurfaceView.setMaxSize(smallWidth, smallHeight);
+        // mAutoFitSurfaceView.setMaxSize(smallWidth, smallHeight);
         record_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         state_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         lifelog_rcv.setVisibility(View.GONE);
