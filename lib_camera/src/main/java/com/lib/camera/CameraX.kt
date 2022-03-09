@@ -9,7 +9,6 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.*
-import androidx.concurrent.futures.await
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -17,8 +16,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import com.lib.camera.extension.getAspectRatio
 import com.lib.record.Config
-import kotlinx.coroutines.Deferred
-import java.util.*
 
 /**
  *
@@ -40,8 +37,9 @@ class CameraX(val config: Config) {
     private var audioEnabled = false
 
     private val mainThreadExecutor by lazy { ContextCompat.getMainExecutor(context) }
-    private var enumerationDeferred: Deferred<Unit>? = null
-    private var cameraLifecycle: CameraLifecycle? = null
+
+    // private var enumerationDeferred: Deferred<Unit>? = null
+    var cameraLifecycle: CameraLifecycle? = null
     private lateinit var context: Context
 
     /**
@@ -53,15 +51,12 @@ class CameraX(val config: Config) {
             if (context is FragmentActivity) context
             else context as Fragment
 
-        bindCaptureUsecase()
-
-
         val provider = ProcessCameraProvider.getInstance(context).get()
         provider.unbindAll()
 
         for (camSelector in arrayOf(
             CameraSelector.DEFAULT_BACK_CAMERA,
-            CameraSelector.DEFAULT_FRONT_CAMERA
+//            CameraSelector.DEFAULT_FRONT_CAMERA
         )) {
             try {
                 // just get the camera.cameraInfo to query capabilities
@@ -75,12 +70,14 @@ class CameraX(val config: Config) {
                         }.also {
                             cameraCapabilities.add(CameraCapability(camSelector, it))
                         }
-                    cameraLifecycle?.onPrepared()
                 }
             } catch (exc: Exception) {
                 Log.e(TAG, "Camera Face $camSelector is not supported")
             }
         }
+        Log.e(TAG, "find camera, bindCaptureUseCase")
+
+        bindCaptureUsecase()
     }
 
     fun startRecord() {
@@ -92,8 +89,8 @@ class CameraX(val config: Config) {
      *   (VideoCapture can work on its own). The function should always execute on
      *   the main thread.
      */
-    private suspend fun bindCaptureUsecase() {
-        val cameraProvider = ProcessCameraProvider.getInstance(context).await()
+    private fun bindCaptureUsecase() {
+        val cameraProvider = ProcessCameraProvider.getInstance(context).get()
 
         val cameraSelector = getCameraSelector(cameraIndex)
 
@@ -105,7 +102,7 @@ class CameraX(val config: Config) {
         val preview = Preview.Builder()
             .setTargetAspectRatio(quality.getAspectRatio(quality))
             .build().apply {
-                // setSurfaceProvider(captureViewBinding.previewView.surfaceProvider)
+                setSurfaceProvider(config.previewTarget.surfaceProvider)
             }
 
         // build a recorder, which can:
@@ -115,7 +112,6 @@ class CameraX(val config: Config) {
             .setQualitySelector(qualitySelector)
             .build()
         videoCapture = VideoCapture.withOutput(recorder)
-        cameraLifecycle?.onPrepared()
         try {
             cameraProvider.unbindAll()
             cameraProvider.bindToLifecycle(
@@ -124,6 +120,8 @@ class CameraX(val config: Config) {
                 videoCapture,
                 preview
             )
+            Log.e(TAG, "Camera prepared.")
+            cameraLifecycle?.onPrepared()
         } catch (exc: Exception) {
             // we are on main thread, let's reset the controls on the UI.
             Log.e(TAG, "Use case binding failed", exc)
@@ -141,6 +139,8 @@ class CameraX(val config: Config) {
      */
     @SuppressLint("MissingPermission")
     private fun startRecording() {
+        Log.i(TAG, "startRecording")
+
         // create MediaStoreOutputOptions for our recorder: resulting our recording!
         val file = CameraUtils.createFile(context, config.directory, ".mp4")
 
@@ -167,7 +167,7 @@ class CameraX(val config: Config) {
         Log.i(TAG, "Recording started")
     }
 
-    private fun stopRecording() {
+    fun stopRecord() {
         currentRecording?.stop()
         currentRecording = null
     }
@@ -177,7 +177,10 @@ class CameraX(val config: Config) {
      */
     private fun onEventCallback(event: VideoRecordEvent) {
         // cache the recording state
-        if (event !is VideoRecordEvent.Status) recordingState = event
+        if (event !is VideoRecordEvent.Status) {
+            Log.e(TAG, "receive event:$event")
+            recordingState = event
+        }
         when (event) {
             is VideoRecordEvent.Status -> {
                 // placeholder: we update the UI with new status after this when() block,
@@ -225,10 +228,15 @@ class CameraX(val config: Config) {
      */
     private fun getCameraSelector(idx: Int): CameraSelector {
         if (cameraCapabilities.size == 0) {
-            Log.i(TAG, "Error: This device does not have any camera, bailing out")
+            Log.e(TAG, "Error: This device does not have any camera, bailing out")
             // context.finish()
         }
         return cameraCapabilities[idx % cameraCapabilities.size].camSelector
+    }
+
+    fun release() {
+        stopRecord()
+        currentRecording?.close()
     }
 
     data class CameraCapability(val camSelector: CameraSelector, val qualities: List<Quality>)

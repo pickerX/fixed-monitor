@@ -50,13 +50,15 @@ public class PermissionsFragment extends Fragment {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
                 && !Settings.canDrawOverlays(getContext())) {
             requestOverlay();
+        } else {
+            requestCamera();
         }
     }
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        requestExternalStorage(this::requestCamera);
+        // requestExternalStorage(this::requestCamera);
     }
 
     private void requestCamera() {
@@ -105,6 +107,7 @@ public class PermissionsFragment extends Fragment {
         ActivityResultLauncher<Intent> session = registerForActivityResult(contract, result -> {
             if (Settings.canDrawOverlays(getContext())) {
                 Log.d("Permission", "获取到悬浮窗权限");
+                requestCamera();
             }
         });
         session.launch(intent);

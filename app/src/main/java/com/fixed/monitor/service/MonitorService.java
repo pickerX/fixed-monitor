@@ -1,5 +1,6 @@
 package com.fixed.monitor.service;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -14,7 +15,6 @@ import android.os.Build;
 import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -42,7 +42,6 @@ import com.fixed.monitor.util.ToolUtil;
 import com.fixed.monitor.util.VideoPathUtil;
 import com.lib.camera.CameraLifecycle;
 import com.lib.camera.CameraUtils;
-import com.lib.camera.view.AutoFitSurfaceView;
 import com.lib.record.Config;
 import com.lib.record.ConfigBuilder;
 import com.lib.record.Monitor;
@@ -50,8 +49,6 @@ import com.lib.record.MonitorFactory;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
-import xyz.doikki.videoplayer.util.L;
 
 public class MonitorService extends Service {
     public static final String TAG = "MonitorService";
@@ -72,7 +69,7 @@ public class MonitorService extends Service {
     private WindowManager.LayoutParams mWindowManagerParams;
     private int smallWidth, smallHeight;
     private View windowMainView;
-//    private AutoFitSurfaceView mAutoFitSurfaceView;
+    //    private AutoFitSurfaceView mAutoFitSurfaceView;
     private PreviewView mAutoFitSurfaceView;
     private View record_view;
     private TextView record_tv, state_tv;
@@ -89,6 +86,8 @@ public class MonitorService extends Service {
         return SERVICE_INTENT;
     }
 
+    private Activity viewContext;
+
     public static Intent getIntent(Context context) {
         Intent intent = new Intent(context, MonitorService.class);
         return intent;
@@ -98,6 +97,10 @@ public class MonitorService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return mBinder;
+    }
+
+    public void bindLifecycleOwner(Activity lifecycle) {
+        viewContext = lifecycle;
     }
 
 
@@ -138,7 +141,10 @@ public class MonitorService extends Service {
         initWindowMangerView();
         initMonitorRecord();
         startCountDown();
-        monitor.recordNow(this);
+        windowMainView.post(() -> {
+            monitor.recordNow(viewContext);
+        });
+
     }
 
     private void initSqlDao() {
@@ -283,6 +289,7 @@ public class MonitorService extends Service {
         }
         // TODO PreviewView resize
         // mAutoFitSurfaceView.setMaxSize(smallWidth, smallHeight);
+        updatePreviewViewSize(smallWidth, smallHeight);
         //获取WindowManager对象
         mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         record_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
@@ -291,7 +298,7 @@ public class MonitorService extends Service {
 
         lifelog_rcv.setLayoutManager(new LinearLayoutManager(this));
         ((FrameLayout.LayoutParams) lifelog_rcv.getLayoutParams()).width = MeasureUtil.getScreenWidth(this) / 4;
-        ((FrameLayout.LayoutParams) lifelog_rcv.getLayoutParams()).height = MeasureUtil.getScreenHeight(this) / 5*3;
+        ((FrameLayout.LayoutParams) lifelog_rcv.getLayoutParams()).height = MeasureUtil.getScreenHeight(this) / 5 * 3;
         lifeLogBeanMCommAdapter = new MCommAdapter<>(this, new MCommVH.MCommVHInterface<LifeLogBean>() {
             @Override
             public int setLayout() {
@@ -397,7 +404,6 @@ public class MonitorService extends Service {
         }, 0, 1, TimeUnit.SECONDS);//0表示首次执行任务的延迟时间，40表示每次执行任务的间隔时间，TimeUnit.MILLISECONDS执行的时间间隔数值单位
     }
 
-
     public void bindMonitorView(View parentView) {
         isbind = true;
         parentView.post(new Runnable() {
@@ -414,12 +420,19 @@ public class MonitorService extends Service {
                 record_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
                 state_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
                 // mAutoFitSurfaceView.setMaxSize(MeasureUtil.getScreenWidth(MonitorService.this), MeasureUtil.getScreenHeight(MonitorService.this));
+                updatePreviewViewSize(MeasureUtil.getScreenWidth(MonitorService.this), MeasureUtil.getScreenHeight(MonitorService.this));
                 lifelog_rcv.setVisibility(View.VISIBLE);
                 mWindowManager.updateViewLayout(windowMainView, mWindowManagerParams);
             }
         });
     }
 
+    private void updatePreviewViewSize(int width, int height) {
+        ViewGroup.LayoutParams p = mAutoFitSurfaceView.getLayoutParams();
+        p.width = width;
+        p.height = height;
+        mAutoFitSurfaceView.setLayoutParams(p);
+    }
 
     public void unBindMonitorView(ViewGroup viewfl) {
         mWindowManagerParams.x = MeasureUtil.dip2px(this, 98);
@@ -428,6 +441,7 @@ public class MonitorService extends Service {
         mWindowManagerParams.width = smallWidth;
         mWindowManagerParams.height = smallHeight;
         // mAutoFitSurfaceView.setMaxSize(smallWidth, smallHeight);
+        updatePreviewViewSize(smallWidth, smallHeight);
         record_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         state_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         lifelog_rcv.setVisibility(View.GONE);

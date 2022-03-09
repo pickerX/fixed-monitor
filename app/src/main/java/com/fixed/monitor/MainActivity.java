@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             monitorService = ((MonitorService.MonitorServiceBinder) service).getService();
+            monitorService.bindLifecycleOwner(MainActivity.this);
         }
     };
 
