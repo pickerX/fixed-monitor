@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 
 import com.lib.camera.CameraLifecycle;
 import com.lib.camera.CameraUtils;
-import com.lib.camera.XCamera;
+import com.lib.camera.Camera2;
 
 /**
  * @author pickerx
@@ -18,12 +18,12 @@ import com.lib.camera.XCamera;
 public class MonitorImpl implements Monitor {
 
     private final Config config;
-    private final XCamera mCamera;
+    private final Camera2 mCamera;
     private long recordingStartMillis;
 
     public MonitorImpl(Config config) {
         this.config = config;
-        this.mCamera = new XCamera(config);
+        this.mCamera = new Camera2(config);
         init();
     }
 

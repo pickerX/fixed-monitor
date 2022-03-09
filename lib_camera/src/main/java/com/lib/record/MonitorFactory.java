@@ -12,8 +12,11 @@ public class MonitorFactory implements Monitor.Factory {
 
     @Override
     public Monitor create(Config config) {
-        Monitor m = new MonitorImpl(config);
-        return m;
+        Monitor monitor;
+        if (config.cameraX) monitor = new MonitorX(config);
+        else monitor = new MonitorImpl(config);
+
+        return monitor;
     }
 
 }

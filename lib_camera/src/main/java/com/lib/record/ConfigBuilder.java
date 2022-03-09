@@ -3,6 +3,8 @@ package com.lib.record;
 import android.content.Context;
 import android.text.TextUtils;
 
+import androidx.camera.view.PreviewView;
+
 import com.lib.camera.view.AutoFitSurfaceView;
 
 /**
@@ -25,9 +27,11 @@ public class ConfigBuilder {
     int maxReserveSize;
     boolean preview;
     boolean loop;
+    boolean cameraX;
 
     String cameraOrientation;
     AutoFitSurfaceView target;
+    PreviewView previewTarget;
 
     public ConfigBuilder(Context context) {
         this.context = context;
@@ -51,6 +55,11 @@ public class ConfigBuilder {
         return this;
     }
 
+    public ConfigBuilder setCameraX(boolean cameraX) {
+        this.cameraX = cameraX;
+        return this;
+    }
+
     /**
      * 设置 最多预留的设备空间
      */
@@ -70,6 +79,11 @@ public class ConfigBuilder {
         return this;
     }
 
+    public ConfigBuilder setTarget(PreviewView target) {
+        this.previewTarget = target;
+        return this;
+    }
+
     public ConfigBuilder setLoop(boolean loop) {
         this.loop = loop;
         return this;
@@ -84,12 +98,14 @@ public class ConfigBuilder {
         if (TextUtils.isEmpty(cameraOrientation)) cameraOrientation = Monitor.FACING_BACK;
 
         c.target = target;
+        c.previewTarget = previewTarget;
         c.preview = preview;
         c.duration = duration;
         c.directory = directory;
         c.maxReserveSize = maxReserveSize;
         c.cameraOrientation = cameraOrientation;
         c.loop = loop;
+        c.cameraX = cameraX;
         return c;
     }
 

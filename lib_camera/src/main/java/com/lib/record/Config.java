@@ -1,5 +1,7 @@
 package com.lib.record;
 
+import androidx.camera.view.PreviewView;
+
 import com.lib.camera.view.AutoFitSurfaceView;
 
 /**
@@ -35,4 +37,9 @@ public class Config {
      */
     public boolean loop;
     public AutoFitSurfaceView target;
+    public PreviewView previewTarget;
+    /**
+     * use cameraX API
+     */
+    public boolean cameraX;
 }

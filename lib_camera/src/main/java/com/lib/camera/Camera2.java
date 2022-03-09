@@ -45,7 +45,7 @@ import java.util.Locale;
  * @author pickerx
  * @date 2022/1/28 12:29 下午
  */
-public class XCamera {
+public class Camera2 {
     static final String TAG = "XCamera";
 
     private final Config config;
@@ -82,7 +82,7 @@ public class XCamera {
      */
     private CameraLifecycle cameraLifecycle;
 
-    public XCamera(Config config) {
+    public Camera2(Config config) {
         this.config = config;
         cameraThread.start();
         mPreviewSurface = config.target;
