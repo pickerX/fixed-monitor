@@ -276,7 +276,6 @@ public class Camera2 {
                 }
             }
         };
-
         cameraManager.openCamera(cameraId, callback, handler);
     }
 
@@ -333,6 +332,20 @@ public class Camera2 {
                 Math.min(mFront.size.getWidth(), CameraUtils.SIZE_1080P.width()),
                 Math.min(mFront.size.getHeight(), CameraUtils.SIZE_1080P.height()),
                 mOutputFile.getAbsolutePath());
+        mRecorder.setOnErrorListener(new MediaRecorder.OnErrorListener() {
+            @Override
+            public void onError(MediaRecorder mediaRecorder, int i, int i1) {
+                lifeLogErro("MediaRecorder error:"
+                        + i + " extra:" + i1, null);
+            }
+        });
+        mRecorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
+            @Override
+            public void onInfo(MediaRecorder mediaRecorder, int i, int i1) {
+                lifeLogComm("MediaRecorder info:"
+                        + i + " extra:" + i1);
+            }
+        });
         // rotate by orientation
         int orientation = CameraUtils.computeRelativeRotation(mCharacteristics, rotation);
         Log.d(TAG, "record orientation:" + orientation);
@@ -570,7 +583,8 @@ public class Camera2 {
 
                     String name = String.format(Locale.getDefault(),
                             "%s (%s) %s %s FPS", orientation, id, size.toString(), fps);
-                    CameraInfo c = new CameraInfo(name, id, size, fps);
+//                    CameraInfo c = new CameraInfo(name, id, size, fps);
+                    CameraInfo c = new CameraInfo(name, id, size, 30);
                     availableCameras.add(c);
                     Log.d(TAG, c.name);
                 }

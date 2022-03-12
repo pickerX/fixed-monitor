@@ -119,7 +119,7 @@ public class CameraUtils {
         return validSizes[target].size;
     }
 
-    static SmartSize SIZE_1080P = new SmartSize(1280, 720);
+    static SmartSize SIZE_1080P = new SmartSize(1280, 960);
 
     public static int computeRelativeRotation(
             CameraCharacteristics characteristics,

@@ -43,10 +43,10 @@
     <!--            app:destination="@id/camera_fragment" />-->
 
     <!--    </fragment>-->
-
+    <!--        android:name="com.fixed.monitor.fragment.CameraXFragment"-->
     <fragment
         android:id="@+id/camera_fragment"
-        android:name="com.fixed.monitor.fragment.CameraXFragment"
+        android:name="com.fixed.monitor.fragment.CameraFragment"
         android:label="Camera">
         <action
             android:id="@+id/action_camera_to_permissions"
